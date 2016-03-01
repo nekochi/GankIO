@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:background="@color/accent_material_dark">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_face"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/woqi"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        app:civ_border_width="1dp"
+        app:civ_border_color="@color/abc_primary_text_material_dark"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+
+        android:layout_gravity="bottom"
+
+        android:layout_marginBottom="30dp"
+        android:textSize="@dimen/abc_text_size_title_material"
+        android:text="this is your name!"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_body_1_material"
+        android:layout_gravity="bottom"
+        android:layout_margin="10dp"
+        android:text="this is your prof!"/>
+</FrameLayout>

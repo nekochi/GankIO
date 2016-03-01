@@ -2,4 +2,8 @@
     <string name="app_name">GankIO</string>
 
     <string name="name_testactivity">TestActivity</string>
+    <string name="test_tv">+</string>
+
+    <string name="title_activity_setting">Setting</string>
+    <string name="quit">Quit</string>
 </resources>
