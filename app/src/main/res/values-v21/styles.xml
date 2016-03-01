@@ -1,5 +1,5 @@
 <resources>
-    <!-- inherit from the material theme -->
+<!-- inherit from the material theme -->
     <style name="AppTheme" parent="AppTheme.Base">
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
@@ -11,4 +11,8 @@
 
     </style>
 
+    <style name="float_button" parent="float_button_base">
+        <item name="android:background">@drawable/fab_selector_v21</item>
+        <item name="android:stateListAnimator">@animator/fab_elevation_selector</item>
+    </style>
 </resources>

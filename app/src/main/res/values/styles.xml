@@ -18,4 +18,10 @@
         <item name="android:textColor">@color/abc_primary_text_material_light</item>
         <item name="android:background">@drawable/abc_btn_borderless_material</item>
     </style>
+
+
+    <style name="float_button_base"/>
+    <style name="float_button" parent="float_button_base">
+        <item name="android:background">@drawable/fab_selector</item>
+    </style>
 </resources>
