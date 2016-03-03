@@ -26,11 +26,18 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/vp_pager"
-            android:layout_width="wrap_content"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/refreshLayout"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_datalist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
         <FrameLayout
             android:layout_width="100dp"
             android:layout_height="100dp"
@@ -52,6 +59,7 @@
         android:layout_gravity="start"
         android:clipToPadding="false"
         android:paddingBottom="48dp"
+        android:layout_marginTop="?attr/actionBarSize"
         app:headerLayout="@layout/view_navigation_header"
         app:menu="@menu/drawer" >
 

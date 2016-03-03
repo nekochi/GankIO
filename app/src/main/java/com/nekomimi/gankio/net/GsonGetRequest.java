@@ -1,7 +1,8 @@
 package com.nekomimi.gankio.net;
 
-import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -11,7 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Makes a get request and converts the response from JsonElement into a
@@ -19,59 +20,40 @@ import java.lang.reflect.Type;
  */
 public class GsonGetRequest<T> extends Request<T>
 {
-    private final Gson gson;
-    private final Type type;
-    private final Response.Listener<T> listener;
+    private final Gson mGson = new Gson();
+    private final Class<T> mClazz;
+    private final Response.Listener<T> mListener;
+    private final Map<String, String> mHeaders;
 
-    /**
-     * Make a GET request and return a parsed object from JSON.
-     *
-     * @param url URL of the request to make
-     * @param type is the type of the object to be returned
-     * @param listener is the listener for the right answer
-     * @param errorListener  is the listener for the wrong answer
-     */
-    public GsonGetRequest
-    (
-            @NonNull final String url,
-            @NonNull final Type type,
-            @NonNull final Gson gson,
-            @NonNull final Response.Listener<T> listener,
-            @NonNull final Response.ErrorListener errorListener
-    )
-    {
+
+    public GsonGetRequest( String url, Class<T> clazz, Map<String, String> headers,
+                       Response.Listener<T> listener, Response.ErrorListener errorListener) {
         super(Method.GET, url, errorListener);
-
-        this.gson = gson;
-        this.type = type;
-        this.listener = listener;
+        this.mClazz = clazz;
+        this.mHeaders = headers;
+        this.mListener = listener;
+        Log.d("Url",url);
     }
 
     @Override
-    protected void deliverResponse(T response)
-    {
-        listener.onResponse(response);
+    public Map<String, String> getHeaders() throws AuthFailureError {
+        return mHeaders != null ? mHeaders : super.getHeaders();
     }
 
     @Override
-    protected Response<T> parseNetworkResponse(NetworkResponse response)
-    {
-        try
-        {
+    protected void deliverResponse(T response) {
+        mListener.onResponse(response);
+    }
+
+    @Override
+    protected Response<T> parseNetworkResponse(NetworkResponse response) {
+        try {
             String json = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-
-            return (Response<T>) Response.success
-                    (
-                            gson.fromJson(json, type),
-                            HttpHeaderParser.parseCacheHeaders(response)
-                    );
-        }
-        catch (UnsupportedEncodingException e)
-        {
+            return Response.success(mGson.fromJson(json, mClazz),
+                    HttpHeaderParser.parseCacheHeaders(response));
+        } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
-        }
-        catch (JsonSyntaxException e)
-        {
+        } catch (JsonSyntaxException e) {
             return Response.error(new ParseError(e));
         }
     }

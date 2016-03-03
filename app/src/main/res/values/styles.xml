@@ -24,4 +24,11 @@
     <style name="float_button" parent="float_button_base">
         <item name="android:background">@drawable/fab_selector</item>
     </style>
+
+    <style name="item_cardview">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:layout_margin">5dp</item>
+        
+    </style>
 </resources>
