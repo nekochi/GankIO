@@ -39,7 +39,7 @@ public class AppAction
 
     public void day(Calendar calendar, final Handler handler)
     {
-        day(calendar.get(Calendar.YEAR)+"",calendar.get(Calendar.MONTH)+1+"",calendar.get(Calendar.DAY_OF_MONTH)+"",handler);
+        day(calendar.get(Calendar.YEAR) + "", calendar.get(Calendar.MONTH) + 1 + "", calendar.get(Calendar.DAY_OF_MONTH) + "", handler);
     }
 
     public void day(String year, String month, String day, final Handler handler)
@@ -51,7 +51,13 @@ public class AppAction
             @Override
             public void onResponse(GankDate response) {
                 Message message = new Message();
-                message.what = response.isError() ? 1 : 0;
+                if(  (!response.isError()) && response.getResults().getAll().size() != 0)
+                {
+                    message.what = 0;
+                }else
+                {
+                    message.what = 1;
+                }
                 message.obj = response;
                 handler.sendMessage(message);
             }

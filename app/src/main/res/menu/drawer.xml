@@ -2,21 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item android:checkable="true"
-            android:id="@+id/nav_menu_1"
-            android:title="first title"/>
-        <item android:title="second title"
+            android:id="@+id/nav_menu_android"
+            android:title="@string/drawer_menu_android"/>
+        <item android:title="@string/drawer_menu_ios"
 
-            android:id="@+id/nav_menu_2"/>
-        <item android:title="3th title"
-            android:id="@+id/nav_menu_3"/>
-        <item android:title="4th title"
-            android:id="@+id/nav_menu_4"/>
-        <item android:title="5th title"
-            android:id="@+id/nav_menu_5"/>
-        <item android:title="6th title"
-            android:id="@+id/nav_menu_6"/>
-        <item android:title="7th title"
-            android:id="@+id/nav_menu_7"/>
+            android:id="@+id/nav_menu_ios"/>
+        <item android:title="@string/drawer_menu_瞎推荐"
+            android:id="@+id/nav_menu_瞎推荐"/>
+        <item android:title="@string/drawer_menu_休息视频"
+            android:id="@+id/nav_menu_休息视频"/>
+        <item android:title="@string/drawer_menu_拓展资源"
+            android:id="@+id/nav_menu_拓展资源"/>
+        <item android:title="@string/drawer_menu_福利"
+            android:id="@+id/nav_menu_福利"/>
+
 
     </group>
 </menu>

@@ -1,6 +1,7 @@
 package com.nekomimi.gankio.activities;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.design.widget.AppBarLayout;
@@ -25,6 +26,11 @@ import com.nekomimi.gankio.R;
 import com.nekomimi.gankio.base.AppAction;
 import com.nekomimi.gankio.bean.GankDate;
 import com.nekomimi.gankio.bean.GankEntity;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -58,6 +64,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     private Context mContext;
     private UiHandler mUiHandler = new UiHandler(this);
 
+    protected ImageLoader mImageLoader = ImageLoader.getInstance();
+    protected DisplayImageOptions mOptions;
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -71,7 +79,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     {
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,mToolbar,R.string.open,R.string.close)
         {
@@ -79,7 +90,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             public void onDrawerClosed(View drawerView)
             {
                 super.onDrawerClosed(drawerView);
-                mAppBarLayout.setExpanded(false);
+                //mAppBarLayout.setExpanded(false);
                 Log.d(TAG, "drawer close");
                 mFlag = false;
             }
@@ -153,6 +164,17 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mContext = this;
         mData = new ArrayList<>();
         mCalendar = Calendar.getInstance();
+
+
+        mOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)//设置下载的图片是否缓存在内存中
+                .considerExifParams(true)  //是否考虑JPEG图像EXIF参数（旋转，翻转）
+                .imageScaleType(ImageScaleType.EXACTLY_STRETCHED)//设置图片以如何的编码方式显示
+                .bitmapConfig(Bitmap.Config.RGB_565)//设置图片的解码类型//
+                .resetViewBeforeLoading(true)//设置图片在下载前是否重置，复位
+                .displayer(new RoundedBitmapDisplayer(20))//是否设置为圆角，弧度为多少
+                .displayer(new FadeInBitmapDisplayer(100))//是否图片加载好后渐入的动画时间
+                .build();//构建完成
     }
 
     @Override
@@ -201,20 +223,36 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void handleMessage(Message message)
     {
-        Log.d(TAG,"handleMessage");
+        Log.d(TAG, "handleMessage");
+
         if(message.what == 0)
         {
+            mSwipeRefreshLayout.setRefreshing(false);
             mData.addAll(mData.size(), ((GankDate) message.obj).getResults().getAll());
             mAdapter.notifyDataSetChanged();
         }
-        mSwipeRefreshLayout.setRefreshing(false);
+        else
+        {
+            mCalendar.add(Calendar.DAY_OF_MONTH, -1);
+            AppAction.getInstance().day(mCalendar, mUiHandler);
+        }
+
     }
 
-    class RAdapter extends RecyclerView.Adapter<RAdapter.CardViewHolder>
+    class RAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     {
+        private final int  NORMAL = 0;
+        private final int  VIDEO = 1;
+        private final int  IMAGE = 2;
+        private final int  TITLE = 3;
+
         @Override
-        public CardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new CardViewHolder( LayoutInflater.from(mContext).inflate(R.layout.view_itemcard,parent,false));
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            if(viewType == NORMAL)
+                return new NormalCardHolder( LayoutInflater.from(mContext).inflate(R.layout.view_itemcard,parent,false));
+            if(viewType == IMAGE)
+                return new ImageHolder( LayoutInflater.from(mContext).inflate(R.layout.view_imagecard, parent, false));
+            return null;
         }
 
         @Override
@@ -223,24 +261,43 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         }
 
         @Override
-        public void onBindViewHolder(CardViewHolder holder, int position)
+        public int getItemViewType(int position)
         {
-            if(holder != null)
+            if(mData.get(position).getType().equals("福利"))
             {
-                holder.itemView.setTag(holder);
-                holder.mWho.setText(mData.get(position).getWho());
-                holder.mTitle.setText(mData.get(position).getDesc());
-                holder.mTime.setText(mData.get(position).getPublishedAt());
+                return IMAGE;
+            }else
+            {
+                return NORMAL;
             }
         }
 
-        class CardViewHolder extends RecyclerView.ViewHolder
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
+        {
+            if(holder == null) return;
+            if(holder instanceof NormalCardHolder)
+            {
+                NormalCardHolder normalHolder = (NormalCardHolder)holder;
+                normalHolder.itemView.setTag(holder);
+                normalHolder.mWho.setText(mData.get(position).getWho());
+                normalHolder.mTitle.setText(mData.get(position).getDesc());
+                normalHolder.mTime.setText(mData.get(position).getCreatedAt());
+            }
+            if(holder instanceof ImageHolder)
+            {
+                ImageHolder imageHolder = (ImageHolder)holder;
+                mImageLoader.displayImage(mData.get(position).getUrl(),imageHolder.mImageView,mOptions);
+            }
+        }
+
+        class NormalCardHolder extends RecyclerView.ViewHolder
         {
             ImageView mIcon;
             TextView mTitle;
             TextView mWho;
             TextView mTime;
-            public CardViewHolder(View itemView) {
+            public NormalCardHolder(View itemView) {
                 super(itemView);
                 mIcon = (ImageView)itemView.findViewById(R.id.iv_icon);
                 mTitle = (TextView)itemView.findViewById(R.id.tv_title);
@@ -248,7 +305,16 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 mTime = (TextView)itemView.findViewById(R.id.tv_time);
             }
         }
-    }
 
+        class ImageHolder extends RecyclerView.ViewHolder
+        {
+            ImageView mImageView;
+            public ImageHolder(View itemView)
+            {
+                super(itemView);
+                mImageView = (ImageView)itemView.findViewById(R.id.iv_gankEntity);
+            }
+        }
+    }
 
 }

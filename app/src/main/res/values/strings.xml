@@ -6,7 +6,13 @@
     <string name="name_testactivity">TestActivity</string>
     <string name="test_tv">+</string>
 
-
+    //drawer menu string
+    <string name="drawer_menu_android">Android</string>
+    <string name="drawer_menu_ios">iOS</string>
+    <string name="drawer_menu_福利">福利</string>
+    <string name="drawer_menu_瞎推荐">瞎推荐</string>
+    <string name="drawer_menu_休息视频">休息视频</string>
+    <string name="drawer_menu_拓展资源">拓展资源</string>
 
     <string name="title_activity_setting">Setting</string>
     <string name="quit">Quit</string>
