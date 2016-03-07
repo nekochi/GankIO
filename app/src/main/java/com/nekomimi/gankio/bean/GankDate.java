@@ -73,6 +73,8 @@ public class GankDate {
 
         private List<GankEntity> 福利;
 
+        private List<GankEntity> 前端;
+
         public List<GankEntity> getAll()
         {
             List<GankEntity> result = new ArrayList<>();
@@ -82,6 +84,7 @@ public class GankDate {
             if(拓展资源 != null) result.addAll(get拓展资源());
             if(瞎推荐 != null) result.addAll(get瞎推荐());
             if(福利 != null) result.addAll(get福利());
+            if(前端 != null) result.addAll(get前端());
             return result;
         }
 
@@ -109,6 +112,10 @@ public class GankDate {
             this.福利 = 福利;
         }
 
+        public void set前端(List<GankEntity> 前端) {
+            this.前端 = 前端;
+        }
+
         public List<GankEntity> getAndroid() {
             return Android;
         }
@@ -131,6 +138,10 @@ public class GankDate {
 
         public List<GankEntity> get福利() {
             return 福利;
+        }
+
+        public List<GankEntity> get前端() {
+            return 前端;
         }
 
     }

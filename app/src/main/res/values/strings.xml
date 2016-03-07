@@ -7,6 +7,7 @@
     <string name="test_tv">+</string>
 
     //drawer menu string
+    <string name="drawer_menu_all">全部</string>
     <string name="drawer_menu_android">Android</string>
     <string name="drawer_menu_ios">iOS</string>
     <string name="drawer_menu_福利">福利</string>

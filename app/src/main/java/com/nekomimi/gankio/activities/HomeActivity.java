@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,6 +28,7 @@ import com.nekomimi.gankio.R;
 import com.nekomimi.gankio.base.AppAction;
 import com.nekomimi.gankio.bean.GankDate;
 import com.nekomimi.gankio.bean.GankEntity;
+import com.nekomimi.gankio.bean.GankItem;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
@@ -55,9 +58,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private AppBarLayout mAppBarLayout;
+    private Button mTestBt;
 
     private boolean mFlag = false;
-    private int mPage = 0;
+    private int mPage = 1;
+    private int mPageNum = 10;
+    private State mState;
     private boolean mIfQuit = false;
     private List<GankEntity> mData;
     private Calendar mCalendar;
@@ -66,6 +72,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
 
     protected ImageLoader mImageLoader = ImageLoader.getInstance();
     protected DisplayImageOptions mOptions;
+
+    enum State{
+        All,Android,Ios,休息视频,拓展资源,瞎推荐,福利
+    }
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -105,20 +115,50 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         };
         mActionBarDrawerToggle.syncState();
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
-        NavigationView mNavTab = (NavigationView)findViewById(R.id.nav_view);
+        final NavigationView mNavTab = (NavigationView)findViewById(R.id.nav_view);
         mNavTab.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 Toast.makeText(getContext(), menuItem.getTitle(), Toast.LENGTH_SHORT).show();
+                dataReset();
                 switch (menuItem.getItemId()) {
-
+                    case R.id.nav_menu_all:
+                        mState = State.All;
+                        AppAction.getInstance().day(mCalendar,mUiHandler);
+                        break;
+                    case R.id.nav_menu_android:
+                        mState = State.Android;
+                        AppAction.getInstance().data(mUiHandler,"Android",mPageNum+"",mPage+"");
+                        break;
+                    case R.id.nav_menu_ios:
+                        mState = State.Ios;
+                        AppAction.getInstance().data(mUiHandler,"iOs",mPageNum+"",mPage+"");
+                        break;
+                    case R.id.nav_menu_休息视频:
+                        mState = State.休息视频;
+                        AppAction.getInstance().data(mUiHandler,"休息视频",mPageNum+"",mPage+"");
+                        break;
+                    case R.id.nav_menu_拓展资源:
+                        mState = State.拓展资源;
+                        AppAction.getInstance().data(mUiHandler,"拓展资源",mPageNum+"",mPage+"");
+                        break;
+                    case R.id.nav_menu_瞎推荐:
+                        mState = State.瞎推荐;
+                        AppAction.getInstance().data(mUiHandler,"瞎推荐",mPageNum+"",mPage+"");
+                        break;
+                    case R.id.nav_menu_福利:
+                        mState = State.福利;
+                        AppAction.getInstance().data(mUiHandler,"福利",mPageNum+"",mPage+"");
+                        break;
                     default:
                         break;
                 }
+                mDrawerLayout.closeDrawers();
                 return false;
             }
         });
-        mFaceIv = (CircleImageView)findViewById(R.id.iv_face);
+        mFaceIv = (CircleImageView)mNavTab.getHeaderView(0).findViewById(R.id.iv_face);
+
         if(mFaceIv == null)
         {
             Log.e(TAG,"noob");
@@ -137,26 +177,52 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             int lastVisibleItem;
+            private static final float HIDE_THRESHOLD = 100;
+            private static final float SHOW_THRESHOLD = 50;
+            int scrollDist = 0;
+            private boolean isVisible = true;
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+                //  Check scrolled distance against the minimum
+                if (isVisible && scrollDist > HIDE_THRESHOLD) {
+                    //  Hide fab & reset scrollDist
+                    hideFloatBt();
+                    scrollDist = 0;
+                    isVisible = false;
+                }
+                //  -MINIMUM because scrolling up gives - dy values
+                else if (!isVisible && scrollDist < -SHOW_THRESHOLD  )  {
+                    //  Show fab & reset scrollDist
+                    showFloatBt();
+                    scrollDist = 0;
+                    isVisible = true;
+                }
 
+                //  Whether we scroll up or down, calculate scroll distance
+                if ((isVisible && dy > 0) || (!isVisible && dy < 0)) {
+                    scrollDist += dy;
+                }
+            }
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE
                         && lastVisibleItem + 1 == recyclerView.getAdapter().getItemCount()) {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                    mPage++;
-                    mCalendar.add(Calendar.DAY_OF_MONTH, -1);
-                    AppAction.getInstance().day(mCalendar, mUiHandler);
+                    loadmore();
                 }
             }
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-            }
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+//            }
         });
         mAppBarLayout = (AppBarLayout)findViewById(R.id.tabanim_appbar);
+        mTestBt = (Button)findViewById(R.id.test_bt);
+        mTestBt.setOnClickListener(this);
     }
 
     private void initData()
@@ -164,7 +230,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mContext = this;
         mData = new ArrayList<>();
         mCalendar = Calendar.getInstance();
-
+        mState = State.All;
 
         mOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)//设置下载的图片是否缓存在内存中
@@ -175,6 +241,58 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 .displayer(new RoundedBitmapDisplayer(20))//是否设置为圆角，弧度为多少
                 .displayer(new FadeInBitmapDisplayer(100))//是否图片加载好后渐入的动画时间
                 .build();//构建完成
+    }
+
+    private void loadmore()
+    {
+        mSwipeRefreshLayout.setRefreshing(true);
+        switch (mState)
+        {
+            case All:
+                AppAction.getInstance().day(mCalendar, mUiHandler);
+                break;
+            case Android:
+                AppAction.getInstance().data(mUiHandler, "Android", mPageNum + "", mPage + "");
+                break;
+            case Ios:
+                AppAction.getInstance().data(mUiHandler, "iOs", mPageNum + "", mPage + "");
+                break;
+            case 休息视频:
+                AppAction.getInstance().data(mUiHandler, "休息视频", mPageNum + "", mPage + "");
+                break;
+            case 拓展资源:
+                AppAction.getInstance().data(mUiHandler, "拓展资源", mPageNum + "", mPage + "");
+                break;
+            case 瞎推荐:
+                AppAction.getInstance().data(mUiHandler, "瞎推荐", mPageNum + "", mPage + "");
+                break;
+            case 福利:
+                AppAction.getInstance().data(mUiHandler, "福利", mPageNum + "", mPage + "");
+                break;
+            default:
+                break;
+        }
+
+
+    }
+    public void dataReset()
+    {
+        mData.clear();
+        mPage = 1;
+        mCalendar = Calendar.getInstance();
+    }
+    public void showFloatBt()
+    {
+        Log.d(TAG, "showFloatBt");
+        mTestBt.animate().alpha(1);
+        mTestBt.animate().scaleX(1).scaleY(1).setInterpolator(new DecelerateInterpolator(2)).start();
+    }
+
+    public void hideFloatBt()
+    {
+        Log.e(TAG,"hideFloatBt");
+        mTestBt.animate().alpha(0);
+        mTestBt.animate().scaleX(0).scaleY(0).setInterpolator(new AccelerateInterpolator(2)).start();
     }
 
     @Override
@@ -204,8 +322,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     public void onClick(View v) {
         switch (v.getId())
         {
-            case R.id.drawer_setting:
-                AppAction.getInstance().day(mCalendar, mUiHandler);
+            case R.id.test_bt:
+               Log.d(TAG,"testButton Clicked");
                 break;
             default:
                 break;
@@ -214,9 +332,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onRefresh() {
-        mData.clear();
-        mPage = 0;
-        mCalendar = Calendar.getInstance();
+        dataReset();
         AppAction.getInstance().day(mCalendar, mUiHandler);
     }
 
@@ -224,12 +340,22 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     public void handleMessage(Message message)
     {
         Log.d(TAG, "handleMessage");
-
+        mSwipeRefreshLayout.setRefreshing(false);
         if(message.what == 0)
         {
-            mSwipeRefreshLayout.setRefreshing(false);
-            mData.addAll(mData.size(), ((GankDate) message.obj).getResults().getAll());
-            mAdapter.notifyDataSetChanged();
+            if(message.arg1 == AppAction.DAY_REQUEST)
+            {
+                mData.addAll(mData.size(), ((GankDate) message.obj).getResults().getAll());
+                mCalendar.add(Calendar.DAY_OF_MONTH, -1);
+                mAdapter.notifyDataSetChanged();
+            }
+            if(message.arg1 == AppAction.DATA_REQUEST)
+            {
+                mData.addAll(mData.size(),((GankItem)message.obj).getResults());
+                mPage++;
+                mAdapter.notifyDataSetChanged();
+            }
+
         }
         else
         {

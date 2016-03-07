@@ -38,19 +38,23 @@
                 android:layout_height="wrap_content" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
-
         <FrameLayout
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_gravity="bottom|end">
+            android:layout_gravity="bottom|end"
+            >
             <Button
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:id="@+id/test_bt"
+                android:scaleX="0"
+                android:scaleY="0"
+                android:alpha="0"
                 android:text="@string/test_tv"
                 style="@style/float_button"
                 android:layout_gravity="center" />
         </FrameLayout>
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView

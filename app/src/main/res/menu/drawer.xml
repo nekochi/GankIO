@@ -15,6 +15,8 @@
             android:id="@+id/nav_menu_拓展资源"/>
         <item android:title="@string/drawer_menu_福利"
             android:id="@+id/nav_menu_福利"/>
+        <item android:title="@string/drawer_menu_all"
+            android:id="@+id/nav_menu_all"/>
 
 
     </group>

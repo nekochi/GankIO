@@ -6,6 +6,7 @@ import android.os.Message;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.nekomimi.gankio.bean.GankDate;
+import com.nekomimi.gankio.bean.GankItem;
 import com.nekomimi.gankio.net.GsonGetRequest;
 import com.nekomimi.gankio.net.VolleyConnect;
 
@@ -19,6 +20,9 @@ public class AppAction
 {
     private static AppAction mAppAction = null;
     private static final String HOST = "http://gank.io/api";
+
+    public static final int DAY_REQUEST = 100001;
+    public static final int DATA_REQUEST = 100002;
 
     public static AppAction getInstance()
     {
@@ -58,6 +62,35 @@ public class AppAction
                 {
                     message.what = 1;
                 }
+                message.arg1 = DAY_REQUEST;
+                message.obj = response;
+                handler.sendMessage(message);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        VolleyConnect.getInstance().add(request);
+    }
+
+    public void data(final Handler handler, String type, String num, String page)
+    {
+        GsonGetRequest<GankItem> request = new GsonGetRequest<>(
+                makeUrl(HOST, "data", type, num, page),
+                GankItem.class,null, new Response.Listener<GankItem>() {
+            @Override
+            public void onResponse(GankItem response) {
+                Message message = new Message();
+                if((!response.isError()) && response.getResults().size() != 0)
+                {
+                    message.what = 0;
+                }else
+                {
+                    message.what = 1;
+                }
+                message.arg1 = DATA_REQUEST;
                 message.obj = response;
                 handler.sendMessage(message);
             }
