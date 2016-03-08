@@ -64,6 +64,7 @@
         android:layout_gravity="start"
         android:clipToPadding="false"
         android:paddingBottom="48dp"
+        android:scrollbars="none"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/view_navigation_header"
         app:menu="@menu/drawer" >

@@ -74,7 +74,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     protected DisplayImageOptions mOptions;
 
     enum State{
-        All,Android,Ios,休息视频,拓展资源,瞎推荐,福利
+        All,Android,Ios,App,休息视频,拓展资源,瞎推荐,前端,福利
     }
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -128,11 +128,15 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                         break;
                     case R.id.nav_menu_android:
                         mState = State.Android;
-                        AppAction.getInstance().data(mUiHandler,"Android",mPageNum+"",mPage+"");
+                        AppAction.getInstance().data(mUiHandler, "Android", mPageNum + "", mPage + "");
                         break;
                     case R.id.nav_menu_ios:
                         mState = State.Ios;
                         AppAction.getInstance().data(mUiHandler,"iOs",mPageNum+"",mPage+"");
+                        break;
+                    case R.id.nav_menu_app:
+                        mState = State.App;
+                        AppAction.getInstance().data(mUiHandler,"App",mPageNum+"",mPage+"");
                         break;
                     case R.id.nav_menu_休息视频:
                         mState = State.休息视频;
@@ -146,10 +150,14 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                         mState = State.瞎推荐;
                         AppAction.getInstance().data(mUiHandler,"瞎推荐",mPageNum+"",mPage+"");
                         break;
-                    case R.id.nav_menu_福利:
-                        mState = State.福利;
-                        AppAction.getInstance().data(mUiHandler,"福利",mPageNum+"",mPage+"");
+                    case R.id.nav_menu_前端:
+                        mState = State.前端;
+                        AppAction.getInstance().data(mUiHandler,"前端",mPageNum+"",mPage+"");
                         break;
+//                    case R.id.nav_menu_福利:
+//                        mState = State.福利;
+//                        AppAction.getInstance().data(mUiHandler,"福利",mPageNum+"",mPage+"");
+//                        break;
                     default:
                         break;
                 }
@@ -256,6 +264,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             case Ios:
                 AppAction.getInstance().data(mUiHandler, "iOs", mPageNum + "", mPage + "");
+                break;
+            case App:
+                AppAction.getInstance().data(mUiHandler, "App", mPageNum + "", mPage + "");
                 break;
             case 休息视频:
                 AppAction.getInstance().data(mUiHandler, "休息视频", mPageNum + "", mPage + "");
@@ -409,6 +420,33 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 normalHolder.mWho.setText(mData.get(position).getWho());
                 normalHolder.mTitle.setText(mData.get(position).getDesc());
                 normalHolder.mTime.setText(mData.get(position).getCreatedAt());
+                if("Android".equals(mData.get(position).getType()))
+                {
+                    normalHolder.mIcon.setImageResource(R.mipmap.ic_android_black_24dp);
+                }
+                else if("瞎推荐".equals(mData.get(position).getType()))
+                {
+                    normalHolder.mIcon.setImageResource(R.mipmap.ic_mood_black_24dp);
+                }
+                else if("前端".equals(mData.get(position).getType()))
+                {
+                    normalHolder.mIcon.setImageResource(R.mipmap.ic_http_black_24dp);
+                }
+                else if("休息视频".equals(mData.get(position).getType()))
+                {
+                    normalHolder.mIcon.setImageResource(R.mipmap.ic_video_library_black_24dp);
+                }
+                else if("拓展资源".equals(mData.get(position).getType()))
+                {
+                    normalHolder.mIcon.setImageResource(R.mipmap.ic_more_vert_black_24dp);
+                }
+                else if("App".equals(mData.get(position).getType()))
+                {
+                    normalHolder.mIcon.setImageResource(R.mipmap.ic_apps_black_24dp);
+                }else
+                {
+                    normalHolder.mIcon.setImageDrawable(null);
+                }
             }
             if(holder instanceof ImageHolder)
             {

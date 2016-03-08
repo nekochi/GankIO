@@ -10,6 +10,8 @@ import com.nekomimi.gankio.bean.GankItem;
 import com.nekomimi.gankio.net.GsonGetRequest;
 import com.nekomimi.gankio.net.VolleyConnect;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Calendar;
 
 /**
@@ -106,10 +108,16 @@ public class AppAction
     public String makeUrl(String orgUrl, String ...s)
     {
         StringBuilder sb = new StringBuilder(orgUrl);
-        for(String str : s)
+        try {
+            for(String str : s)
+            {
+                sb.append("/").append(URLEncoder.encode(str,"UTF-8"));
+            }
+        }catch (UnsupportedEncodingException e)
         {
-            sb.append("/").append(str);
+            e.printStackTrace();
         }
+
         return sb.toString();
     }
 }

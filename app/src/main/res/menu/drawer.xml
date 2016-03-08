@@ -3,20 +3,31 @@
     <group android:checkableBehavior="single">
         <item android:checkable="true"
             android:id="@+id/nav_menu_android"
-            android:title="@string/drawer_menu_android"/>
+            android:title="@string/drawer_menu_android"
+            android:icon="@mipmap/ic_android_black_24dp"/>
         <item android:title="@string/drawer_menu_ios"
-
             android:id="@+id/nav_menu_ios"/>
+        <item android:title="@string/drawer_menu_app"
+            android:id="@+id/nav_menu_app"
+            android:icon="@mipmap/ic_apps_black_24dp"/>
         <item android:title="@string/drawer_menu_瞎推荐"
-            android:id="@+id/nav_menu_瞎推荐"/>
+            android:id="@+id/nav_menu_瞎推荐"
+            android:icon="@mipmap/ic_mood_black_24dp"/>
         <item android:title="@string/drawer_menu_休息视频"
-            android:id="@+id/nav_menu_休息视频"/>
+            android:id="@+id/nav_menu_休息视频"
+            android:icon="@mipmap/ic_video_library_black_24dp"/>
         <item android:title="@string/drawer_menu_拓展资源"
-            android:id="@+id/nav_menu_拓展资源"/>
+            android:id="@+id/nav_menu_拓展资源"
+            android:icon="@mipmap/ic_more_vert_black_24dp"/>
+        <item android:title="@string/drawer_menu_前端"
+            android:id="@+id/nav_menu_前端"
+            android:icon="@mipmap/ic_http_black_24dp"/>
         <item android:title="@string/drawer_menu_福利"
-            android:id="@+id/nav_menu_福利"/>
+            android:id="@+id/nav_menu_福利"
+            android:icon="@mipmap/ic_whatshot_black_24dp"/>
         <item android:title="@string/drawer_menu_all"
-            android:id="@+id/nav_menu_all"/>
+            android:id="@+id/nav_menu_all"
+            android:icon="@mipmap/ic_home_black_24dp"/>
 
 
     </group>

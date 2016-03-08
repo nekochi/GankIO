@@ -61,6 +61,7 @@ public class GankDate {
 
         private List<GankEntity> iOS;
 
+        private List<GankEntity> App;
 
         private List<GankEntity> 休息视频;
 
@@ -80,6 +81,7 @@ public class GankDate {
             List<GankEntity> result = new ArrayList<>();
             if(Android != null) result.addAll(getAndroid());
             if(iOS != null) result.addAll(getIOS());
+            if(App != null) result.addAll(getApp());
             if(休息视频 != null) result.addAll(get休息视频());
             if(拓展资源 != null) result.addAll(get拓展资源());
             if(瞎推荐 != null) result.addAll(get瞎推荐());
@@ -94,6 +96,10 @@ public class GankDate {
 
         public void setIOS(List<GankEntity> iOS) {
             this.iOS = iOS;
+        }
+
+        public void setApp(List<GankEntity> App) {
+            this.App = App;
         }
 
         public void set休息视频(List<GankEntity> 休息视频) {
@@ -122,6 +128,10 @@ public class GankDate {
 
         public List<GankEntity> getIOS() {
             return iOS;
+        }
+
+        public List<GankEntity> getApp() {
+            return App;
         }
 
         public List<GankEntity> get休息视频() {
