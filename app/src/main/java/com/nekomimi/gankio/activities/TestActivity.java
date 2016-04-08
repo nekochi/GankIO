@@ -10,6 +10,8 @@ import android.widget.Button;
  */
 public class TestActivity extends BaseActivity
 {
+    String url = "";
+    String filename = "";
     @Override
     public void onCreate(Bundle savedInstanceState)
     {

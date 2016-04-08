@@ -1,6 +1,7 @@
 package com.nekomimi.gankio.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Message;
@@ -19,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -389,6 +392,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 return new NormalCardHolder( LayoutInflater.from(mContext).inflate(R.layout.view_itemcard,parent,false));
             if(viewType == IMAGE)
                 return new ImageHolder( LayoutInflater.from(mContext).inflate(R.layout.view_imagecard, parent, false));
+            if(viewType == VIDEO)
+                return new VideoHolder(LayoutInflater.from(mContext).inflate(R.layout.view_videocard, parent, false));
             return null;
         }
 
@@ -403,20 +408,38 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             if(mData.get(position).getType().equals("福利"))
             {
                 return IMAGE;
-            }else
+            }
+            else if(mData.get(position).getType().equals("休息视频"))
+            {
+                return VIDEO;
+            }
+            else
             {
                 return NORMAL;
             }
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
+        public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position)
         {
             if(holder == null) return;
             if(holder instanceof NormalCardHolder)
             {
                 NormalCardHolder normalHolder = (NormalCardHolder)holder;
                 normalHolder.itemView.setTag(holder);
+                normalHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(v.getTag() instanceof  ImageHolder)
+                        {
+                            return;
+                        }
+                        Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
+                        intent.putExtra("URL",mData.get(position).getUrl());
+                        intent.putExtra("TITLE", mData.get(position).getDesc());
+                        startActivity(intent);
+                    }
+                });
                 normalHolder.mWho.setText(mData.get(position).getWho());
                 normalHolder.mTitle.setText(mData.get(position).getDesc());
                 normalHolder.mTime.setText(mData.get(position).getCreatedAt());
@@ -451,7 +474,38 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             if(holder instanceof ImageHolder)
             {
                 ImageHolder imageHolder = (ImageHolder)holder;
-                mImageLoader.displayImage(mData.get(position).getUrl(),imageHolder.mImageView,mOptions);
+                mImageLoader.displayImage(mData.get(position).getUrl(), imageHolder.mImageView, mOptions);
+            }
+            if(holder instanceof VideoHolder)
+            {
+                VideoHolder videoHolder = (VideoHolder)holder;
+                videoHolder.itemView.setTag(videoHolder);
+                videoHolder.mTitle.setText(mData.get(position).getDesc());
+                videoHolder.mWebView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        view.loadUrl(url); //在当前的webview中跳转到新的url
+                        return true;
+                    }
+                });
+                videoHolder.mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+                videoHolder.mWebView.getSettings().setSupportZoom(true);
+                videoHolder.mWebView.getSettings().setJavaScriptEnabled(true);
+                videoHolder.mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+                videoHolder.mWebView.getSettings().setDomStorageEnabled(true);
+                videoHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        VideoHolder holder = (VideoHolder)v.getTag();
+                        Log.d(TAG,  holder.mWebView.getUrl() + "-----------");
+                        Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
+                        intent.putExtra("URL",mData.get(position).getUrl());
+                        intent.putExtra("TITLE", mData.get(position).getDesc());
+                        startActivity(intent);
+
+                    }
+                });
+                videoHolder.mWebView.loadUrl(mData.get(position).getUrl().split(".htm")[0]);
             }
         }
 
@@ -477,6 +531,18 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             {
                 super(itemView);
                 mImageView = (ImageView)itemView.findViewById(R.id.iv_gankEntity);
+            }
+        }
+
+        class VideoHolder extends RecyclerView.ViewHolder
+        {
+            WebView mWebView;
+            TextView mTitle;
+            public VideoHolder(View itemView)
+            {
+                super(itemView);
+                mWebView = (WebView)itemView.findViewById(R.id.wv_video);
+                mTitle = (TextView)itemView.findViewById(R.id.tv_video_title);
             }
         }
     }
