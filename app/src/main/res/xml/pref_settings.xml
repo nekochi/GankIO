@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/net_settings">
+        <SwitchPreference
+            android:key="@string/auto_load_pic_at_wifi"
+            android:title="@string/auto_load_pic_at_wifi"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/general">
+        <com.nekomimi.gankio.view.MListPreference
+            android:key="@string/open_way"
+            android:layout="@layout/view_listpreference"
+            android:title="@string/open_way"
+            android:entries="@array/open_way"
+            android:entryValues="@array/open_way_value"
+            android:defaultValue="@string/this_app">
+        </com.nekomimi.gankio.view.MListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/other_settings">
+        <Preference
+            android:title="@string/check_update"/>
+        <Preference
+            android:title="@string/about"/>
+    </PreferenceCategory>
+</PreferenceScreen>

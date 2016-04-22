@@ -7,9 +7,13 @@
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
 
-        <item name="android:statusBarColor">@android:color/transparent</item>
+
         <item name="android:textColorPrimary">@color/abc_primary_text_material_light</item>
 
+    </style>
+
+    <style name="HomeTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="float_button" parent="float_button_base">

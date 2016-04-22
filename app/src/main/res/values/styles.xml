@@ -11,6 +11,10 @@
         <item name="windowActionBar">false</item>
     </style>
 
+    <style name="AppTheme.Actionbar" parent="AppTheme.Base">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+    </style>
     <style name="nav_footer_button">
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">match_parent</item>

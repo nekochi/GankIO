@@ -37,8 +37,8 @@ public class DetailActivity extends BaseActivity
         Log.d("TITLE", mTitle);
         mToolbar.setTitle(mTitle);
 
-        mToolbar.inflateMenu(R.menu.detail_menu);
-        mToolbar.setOnMenuItemClickListener(onMenuItemClick);
+//        mToolbar.inflateMenu(R.menu.detail_menu);
+//        mToolbar.setOnMenuItemClickListener(onMenuItemClick);
         setSupportActionBar(mToolbar);
 
     }
@@ -60,9 +60,6 @@ public class DetailActivity extends BaseActivity
             case android.R.id.home:
                 finish();
                break;
-            case R.id.action_edit:
-                msg += "Click edit";
-                break;
             case R.id.action_share:
                 msg += "Click share";
                 break;
@@ -112,9 +109,6 @@ public class DetailActivity extends BaseActivity
         public boolean onMenuItemClick(MenuItem menuItem) {
             String msg = "";
             switch (menuItem.getItemId()) {
-                case R.id.action_edit:
-                    msg += "Click edit";
-                    break;
                 case R.id.action_share:
                     msg += "Click share";
                     break;

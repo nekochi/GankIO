@@ -2,16 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_edit"
-        android:title="@string/action_edit"
-        android:orderInCategory="80"
-        android:icon="@android:drawable/ic_menu_edit"
-        app:showAsAction="ifRoom" />
-
     <item android:id="@+id/action_share"
         android:title="@string/action_edit"
         android:orderInCategory="90"
-        android:icon="@android:drawable/ic_menu_share"
+        android:icon="@mipmap/ic_share_white_24dp"
         app:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_settings"

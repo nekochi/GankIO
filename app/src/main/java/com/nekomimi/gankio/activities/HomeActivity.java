@@ -3,8 +3,10 @@ package com.nekomimi.gankio.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -32,6 +34,7 @@ import com.nekomimi.gankio.base.AppAction;
 import com.nekomimi.gankio.bean.GankDate;
 import com.nekomimi.gankio.bean.GankEntity;
 import com.nekomimi.gankio.bean.GankItem;
+import com.nekomimi.gankio.utils.NetUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
@@ -119,12 +122,14 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mActionBarDrawerToggle.syncState();
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
         final NavigationView mNavTab = (NavigationView)findViewById(R.id.nav_view);
-        mNavTab.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        mNavTab.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
+        {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 Toast.makeText(getContext(), menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 dataReset();
-                switch (menuItem.getItemId()) {
+                switch (menuItem.getItemId())
+                {
                     case R.id.nav_menu_all:
                         mState = State.All;
                         AppAction.getInstance().day(mCalendar,mUiHandler);
@@ -234,6 +239,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mAppBarLayout = (AppBarLayout)findViewById(R.id.tabanim_appbar);
         mTestBt = (Button)findViewById(R.id.test_bt);
         mTestBt.setOnClickListener(this);
+        dataReset();
+        AppAction.getInstance().day(mCalendar, mUiHandler);
     }
 
     private void initData()
@@ -339,6 +346,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             case R.id.test_bt:
                Log.d(TAG,"testButton Clicked");
                 break;
+            case R.id.drawer_setting:
+                startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
+                break;
             default:
                 break;
         }
@@ -409,10 +419,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             {
                 return IMAGE;
             }
-            else if(mData.get(position).getType().equals("休息视频"))
-            {
-                return VIDEO;
-            }
+//            else if(mData.get(position).getType().equals("休息视频"))
+//            {
+//                return VIDEO;
+//            }
             else
             {
                 return NORMAL;
@@ -430,22 +440,47 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 normalHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(v.getTag() instanceof  ImageHolder)
-                        {
+                        if (v.getTag() instanceof ImageHolder) {
                             return;
                         }
-                        Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
-                        intent.putExtra("URL",mData.get(position).getUrl());
-                        intent.putExtra("TITLE", mData.get(position).getDesc());
-                        startActivity(intent);
+                        String way = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getString(getString(R.string.open_way),getString(R.string.this_app));
+                        if(way.equals(getString(R.string.this_app)))
+                        {
+                            Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
+                            intent.putExtra("URL", mData.get(position).getUrl());
+                            intent.putExtra("TITLE", mData.get(position).getDesc());
+                            startActivity(intent);
+                        }
+                        if(way.equals(getString(R.string.browser)))
+                        {
+                            Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse(mData.get(position).getUrl()));
+                            startActivity(it);
+                        }
+
                     }
                 });
+//                normalHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//                    @Override
+//                    public boolean onLongClick(View v) {
+//                        if (v.getTag() instanceof ImageHolder) {
+//                            return false;
+//                        }
+//                        Intent it = new Intent(Intent.ACTION_VIEW, Uri.parse(mData.get(position).getUrl()));
+////                        it.setClassName("com.android.browser", "com.android.browser.BrowserActivity");
+//                        startActivity(it);
+//                        return false;
+//                    }
+//                });
                 normalHolder.mWho.setText(mData.get(position).getWho());
                 normalHolder.mTitle.setText(mData.get(position).getDesc());
                 normalHolder.mTime.setText(mData.get(position).getCreatedAt());
-                if("Android".equals(mData.get(position).getType()))
+                if("android".equals(mData.get(position).getType().toLowerCase()))
                 {
                     normalHolder.mIcon.setImageResource(R.mipmap.ic_android_black_24dp);
+                }
+                else if("ios".equals(mData.get(position).getType().toLowerCase()))
+                {
+                    normalHolder.mIcon.setImageResource(R.mipmap.ic_ios_black_24dp);
                 }
                 else if("瞎推荐".equals(mData.get(position).getType()))
                 {
@@ -474,7 +509,11 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             if(holder instanceof ImageHolder)
             {
                 ImageHolder imageHolder = (ImageHolder)holder;
-                mImageLoader.displayImage(mData.get(position).getUrl(), imageHolder.mImageView, mOptions);
+                if(NetUtil.getNetworkState(HomeActivity.this) == NetUtil.WifiState &&
+                        PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getBoolean(getString(R.string.auto_load_pic_at_wifi),true))
+                {
+                    mImageLoader.displayImage(mData.get(position).getUrl(), imageHolder.mImageView, mOptions);
+                }
             }
             if(holder instanceof VideoHolder)
             {

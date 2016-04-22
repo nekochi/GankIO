@@ -18,9 +18,32 @@
     <string name="drawer_menu_前端">前端</string>
     <string name="drawer_menu_拓展资源">拓展资源</string>
 
-    <string name="title_activity_setting">Setting</string>
-    <string name="quit">Quit</string>
+    <string name="action_edit">edit</string>
+    <string name="quit">退出</string>
+    <string name="action_settings">设置</string>
+    <string name="title_activity_settings">设置</string>
+
+    <!-- Strings related to Settings -->
+    <string name="net_settings">网络</string>
+    <string name="auto_load_pic_at_wifi">仅WiFi下自动加载福利图片</string>
     
-    <string name="action_edit">Edit</string>
-    <string name="action_settings">Setting</string>
+    <string name="general">常规设置</string>
+    <string name="other_settings">其他设置</string>
+    <string name="open_way">链接打开方式：</string>
+    <string name="this_app">本App</string>
+    <string name="browser">其他浏览器</string>
+    <string name="check_update">检查</string>
+    <string name="about">关于</string>
+
+    <string name="sb">然而并没有</string>
+
+
+    <array name="open_way">
+        <item>@string/this_app</item>
+        <item>@string/browser</item>
+    </array>
+    <array name="open_way_value">
+        <item>@string/this_app</item>
+        <item>@string/browser</item>
+    </array>
 </resources>

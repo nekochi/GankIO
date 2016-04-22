@@ -6,7 +6,8 @@
             android:title="@string/drawer_menu_android"
             android:icon="@mipmap/ic_android_black_24dp"/>
         <item android:title="@string/drawer_menu_ios"
-            android:id="@+id/nav_menu_ios"/>
+            android:id="@+id/nav_menu_ios"
+            android:icon="@mipmap/ic_ios_black_24dp"/>
         <item android:title="@string/drawer_menu_app"
             android:id="@+id/nav_menu_app"
             android:icon="@mipmap/ic_apps_black_24dp"/>

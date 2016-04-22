@@ -78,7 +78,7 @@
             <Button
                 android:id="@+id/drawer_setting"
                 style="@style/nav_footer_button"
-                android:text="@string/title_activity_setting"/>
+                android:text="@string/title_activity_settings"/>
             <Button
                 android:id="@+id/drawer_quit"
                 style="@style/nav_footer_button"
