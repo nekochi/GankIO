@@ -11,6 +11,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.nekomimi.gankio.R;
+import com.nekomimi.gankio.db.GankDdHelper;
+import com.nekomimi.gankio.db.GankItem;
+
+import java.util.List;
 
 /**
  * Created by hongchi on 2016-3-16.
@@ -19,10 +23,16 @@ import com.nekomimi.gankio.R;
 public class DetailActivity extends BaseActivity
 {
     private static final String TAG = "DetailActivity";
+
+    public static final String TITLE = "TITLE";
+    public static final String ID = "ID";
+    public static final String URL = "URL";
     private WebView mWebView;
     private String mUrl;
     private Toolbar mToolbar;
     private String mTitle;
+    private String mId;
+    private boolean mIsStared = false;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -31,9 +41,10 @@ public class DetailActivity extends BaseActivity
         mToolbar = (Toolbar)findViewById(R.id.toolbar_newsinfo);
         initWebView();
 
-        mUrl = getIntent().getStringExtra("URL");
+        mUrl = getIntent().getStringExtra(URL);
         loadurl(mUrl);
-        mTitle = getIntent().getStringExtra("TITLE");
+        mTitle = getIntent().getStringExtra(TITLE);
+        mId = getIntent().getStringExtra(ID);
         Log.d("TITLE", mTitle);
         mToolbar.setTitle(mTitle);
 
@@ -48,7 +59,15 @@ public class DetailActivity extends BaseActivity
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.detail_menu, menu);
-
+        if(mId != null)
+        {
+            List result = GankDdHelper.getInstance(this).query(mId);
+            if(result != null && result.size() != 0)
+            {
+                menu.findItem(R.id.action_star).setIcon(R.mipmap.ic_star_white_24dp);
+                mIsStared = true;
+            }
+        }
         return true;
     }
     @Override
@@ -63,8 +82,18 @@ public class DetailActivity extends BaseActivity
             case R.id.action_share:
                 msg += "Click share";
                 break;
-            case R.id.action_settings:
-                msg += mWebView.getUrl();
+            case R.id.action_star:
+                if(mIsStared)
+                {
+                    GankDdHelper.getInstance(this).delete(mId);
+                    mIsStared = false;
+                    mToolbar.getMenu().findItem(R.id.action_star).setIcon(R.mipmap.ic_star_border_white_24dp);
+                }else {
+                    GankItem gankItem = new GankItem(null,mId,null,mTitle,null,null,mUrl,null,null);
+                    GankDdHelper.getInstance(this).add(gankItem);
+                    mIsStared = true;
+                    mToolbar.getMenu().findItem(R.id.action_star).setIcon(R.mipmap.ic_star_white_24dp);
+                }
                 break;
         }
 
@@ -102,28 +131,6 @@ public class DetailActivity extends BaseActivity
         mWebView.getSettings().setSupportZoom(true);
         mWebView.getSettings().setJavaScriptEnabled(true);
     }
-
-
-    private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            String msg = "";
-            switch (menuItem.getItemId()) {
-                case R.id.action_share:
-                    msg += "Click share";
-                    break;
-                case R.id.action_settings:
-                    msg += mWebView.getUrl();
-                    break;
-            }
-
-            if(!msg.equals("")) {
-                Log.d(TAG, "onMenuItemClick: " + msg);
-            }
-            return true;
-        }
-    };
-
 
 
     @Override
