@@ -447,8 +447,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                         if(way.equals(getString(R.string.this_app)))
                         {
                             Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
-                            intent.putExtra("URL", mData.get(position).getUrl());
-                            intent.putExtra("TITLE", mData.get(position).getDesc());
+                            intent.putExtra(DetailActivity.URL,mData.get(position).getUrl());
+                            intent.putExtra(DetailActivity.ID,mData.get(position).get_id().toUpperCase());
+                            intent.putExtra(DetailActivity.TITLE, mData.get(position).getDesc());
                             startActivity(intent);
                         }
                         if(way.equals(getString(R.string.browser)))
@@ -535,11 +536,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 videoHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        VideoHolder holder = (VideoHolder)v.getTag();
-                        Log.d(TAG,  holder.mWebView.getUrl() + "-----------");
+                        VideoHolder holder = (VideoHolder) v.getTag();
+                        Log.d(TAG, holder.mWebView.getUrl() + "-----------");
                         Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
-                        intent.putExtra("URL",mData.get(position).getUrl());
-                        intent.putExtra("TITLE", mData.get(position).getDesc());
+                        intent.putExtra(DetailActivity.URL,mData.get(position).getUrl());
+                        intent.putExtra(DetailActivity.ID, mData.get(position).get_id());
+                        intent.putExtra(DetailActivity.TITLE, mData.get(position).getDesc());
                         startActivity(intent);
 
                     }

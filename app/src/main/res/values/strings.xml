@@ -22,6 +22,7 @@
     <string name="quit">退出</string>
     <string name="action_settings">设置</string>
     <string name="title_activity_settings">设置</string>
+    <string name="action_star">收藏</string>
 
     <!-- Strings related to Settings -->
     <string name="net_settings">网络</string>
