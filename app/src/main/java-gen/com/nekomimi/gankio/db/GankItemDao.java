@@ -25,7 +25,7 @@ public class GankItemDao extends AbstractDao<GankItem, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property GankId = new Property(1, String.class, "gankId", false, "GANK_ID");
-        public final static Property CreateAt = new Property(2, java.util.Date.class, "createAt", false, "CREATE_AT");
+        public final static Property CreateAt = new Property(2, String.class, "createAt", false, "CREATE_AT");
         public final static Property Desc = new Property(3, String.class, "Desc", false, "DESC");
         public final static Property PublishedAt = new Property(4, String.class, "publishedAt", false, "PUBLISHED_AT");
         public final static Property Type = new Property(5, String.class, "type", false, "TYPE");
@@ -49,7 +49,7 @@ public class GankItemDao extends AbstractDao<GankItem, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"GANK_ITEM\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"GANK_ID\" TEXT NOT NULL ," + // 1: gankId
-                "\"CREATE_AT\" INTEGER," + // 2: createAt
+                "\"CREATE_AT\" TEXT," + // 2: createAt
                 "\"DESC\" TEXT," + // 3: Desc
                 "\"PUBLISHED_AT\" TEXT," + // 4: publishedAt
                 "\"TYPE\" TEXT," + // 5: type
@@ -75,9 +75,9 @@ public class GankItemDao extends AbstractDao<GankItem, Long> {
         }
         stmt.bindString(2, entity.getGankId());
  
-        java.util.Date createAt = entity.getCreateAt();
+        String createAt = entity.getCreateAt();
         if (createAt != null) {
-            stmt.bindLong(3, createAt.getTime());
+            stmt.bindString(3, createAt);
         }
  
         String Desc = entity.getDesc();
@@ -119,7 +119,7 @@ public class GankItemDao extends AbstractDao<GankItem, Long> {
         GankItem entity = new GankItem( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // gankId
-            cursor.isNull(offset + 2) ? null : new java.util.Date(cursor.getLong(offset + 2)), // createAt
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // createAt
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // Desc
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // publishedAt
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // type
@@ -135,7 +135,7 @@ public class GankItemDao extends AbstractDao<GankItem, Long> {
     public void readEntity(Cursor cursor, GankItem entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setGankId(cursor.getString(offset + 1));
-        entity.setCreateAt(cursor.isNull(offset + 2) ? null : new java.util.Date(cursor.getLong(offset + 2)));
+        entity.setCreateAt(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setDesc(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setPublishedAt(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setType(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));

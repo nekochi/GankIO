@@ -27,9 +27,20 @@ public class DetailActivity extends BaseActivity
     public static final String TITLE = "TITLE";
     public static final String ID = "ID";
     public static final String URL = "URL";
+    public static final String CREATEAT = "CREATEAT";
+    public static final String USED = "USED";
+    public static final String WHO = "WHO";
+    public static final String TYPE = "TYPE";
+    public static final String PUBLISHEDAT = "PUBLISHEDAT";
+
     private WebView mWebView;
-    private String mUrl;
     private Toolbar mToolbar;
+
+    private String mUrl;
+    private String mCreateAt;
+    private String mWho;
+    private String mType;
+    private String mPublishAt;
     private String mTitle;
     private String mId;
     private boolean mIsStared = false;
@@ -45,6 +56,10 @@ public class DetailActivity extends BaseActivity
         loadurl(mUrl);
         mTitle = getIntent().getStringExtra(TITLE);
         mId = getIntent().getStringExtra(ID);
+        mCreateAt = getIntent().getStringExtra(CREATEAT);
+        mWho = getIntent().getStringExtra(WHO);
+        mType = getIntent().getStringExtra(TYPE);
+        mPublishAt = getIntent().getStringExtra(PUBLISHEDAT);
         Log.d("TITLE", mTitle);
         mToolbar.setTitle(mTitle);
 
@@ -89,7 +104,7 @@ public class DetailActivity extends BaseActivity
                     mIsStared = false;
                     mToolbar.getMenu().findItem(R.id.action_star).setIcon(R.mipmap.ic_star_border_white_24dp);
                 }else {
-                    GankItem gankItem = new GankItem(null,mId,null,mTitle,null,null,mUrl,null,null);
+                    GankItem gankItem = new GankItem(null,mId,mCreateAt,mTitle,mPublishAt,mType,mUrl,mWho,null);
                     GankDdHelper.getInstance(this).add(gankItem);
                     mIsStared = true;
                     mToolbar.getMenu().findItem(R.id.action_star).setIcon(R.mipmap.ic_star_white_24dp);
@@ -129,6 +144,7 @@ public class DetailActivity extends BaseActivity
         });
         mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         mWebView.getSettings().setSupportZoom(true);
+        mWebView.getSettings().setBuiltInZoomControls(true);
         mWebView.getSettings().setJavaScriptEnabled(true);
     }
 

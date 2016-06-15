@@ -34,6 +34,7 @@ import com.nekomimi.gankio.base.AppAction;
 import com.nekomimi.gankio.bean.GankDate;
 import com.nekomimi.gankio.bean.GankEntity;
 import com.nekomimi.gankio.bean.GankItem;
+import com.nekomimi.gankio.db.GankDdHelper;
 import com.nekomimi.gankio.utils.NetUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -80,7 +81,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     protected DisplayImageOptions mOptions;
 
     enum State{
-        All,Android,Ios,App,休息视频,拓展资源,瞎推荐,前端,福利
+        All,Android,Ios,App,休息视频,拓展资源,瞎推荐,前端,福利,收藏
     }
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -161,6 +162,31 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                     case R.id.nav_menu_前端:
                         mState = State.前端;
                         AppAction.getInstance().data(mUiHandler,"前端",mPageNum+"",mPage+"");
+                        break;
+                    case R.id.nav_menu_star:
+                        mState = State.收藏;
+                        List dataList = GankDdHelper.getInstance(HomeActivity.this).queryAll();
+                        mData.clear();
+                        Toast.makeText(HomeActivity.this,dataList.size() + "+++",Toast.LENGTH_LONG).show();
+                        for(int i = 0 ; i < dataList.size() ; i++)
+                        {
+                            if(dataList.get(i) instanceof com.nekomimi.gankio.db.GankItem)
+                            {
+                                com.nekomimi.gankio.db.GankItem gi = (com.nekomimi.gankio.db.GankItem)dataList.get(i);
+                                GankEntity ge = new GankEntity();
+                                ge.setCreatedAt(gi.getCreateAt());
+                                ge.setDesc(gi.getDesc());
+                                ge.setPublishedAt(gi.getPublishedAt());
+                                ge.setType(gi.getType());
+                                ge.set_id(gi.getGankId());
+                                ge.setUrl(gi.getUrl());
+//                                ge.setUsed(gi.getUsed());
+                                ge.setWho(gi.getWho());
+                                mData.add(ge);
+                            }
+                        }
+                        mAdapter.notifyDataSetChanged();
+
                         break;
 //                    case R.id.nav_menu_福利:
 //                        mState = State.福利;
@@ -289,6 +315,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             case 福利:
                 AppAction.getInstance().data(mUiHandler, "福利", mPageNum + "", mPage + "");
+                break;
+            case 收藏:
                 break;
             default:
                 break;
@@ -450,6 +478,10 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                             intent.putExtra(DetailActivity.URL,mData.get(position).getUrl());
                             intent.putExtra(DetailActivity.ID,mData.get(position).get_id().toUpperCase());
                             intent.putExtra(DetailActivity.TITLE, mData.get(position).getDesc());
+                            intent.putExtra(DetailActivity.WHO, mData.get(position).getWho());
+                            intent.putExtra(DetailActivity.CREATEAT, mData.get(position).getCreatedAt());
+                            intent.putExtra(DetailActivity.PUBLISHEDAT, mData.get(position).getPublishedAt());
+                            intent.putExtra(DetailActivity.TYPE, mData.get(position).getType());
                             startActivity(intent);
                         }
                         if(way.equals(getString(R.string.browser)))

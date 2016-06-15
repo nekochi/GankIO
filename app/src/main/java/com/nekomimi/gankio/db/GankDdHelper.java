@@ -50,6 +50,11 @@ public class GankDdHelper {
         return query.list();
     }
 
+    public List queryAll()
+    {
+        return mGankItemDao.loadAll();
+    }
+
     public void add(GankItem item)
     {
         mGankItemDao.insertOrReplace(item);

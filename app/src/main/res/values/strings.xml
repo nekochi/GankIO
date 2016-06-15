@@ -8,6 +8,7 @@
     <string name="test_tv">+</string>
 
     //drawer menu string
+    <string name="drawer_menu_star">收藏</string>
     <string name="drawer_menu_all">全部</string>
     <string name="drawer_menu_android">Android</string>
     <string name="drawer_menu_ios">iOS</string>

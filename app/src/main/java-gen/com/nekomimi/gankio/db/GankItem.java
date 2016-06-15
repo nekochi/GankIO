@@ -9,7 +9,7 @@ public class GankItem {
     private Long id;
     /** Not-null value. */
     private String gankId;
-    private java.util.Date createAt;
+    private String createAt;
     private String Desc;
     private String publishedAt;
     private String type;
@@ -25,7 +25,7 @@ public class GankItem {
         this.id = id;
     }
 
-    public GankItem(Long id, String gankId, java.util.Date createAt, String Desc, String publishedAt, String type, String url, String who, Boolean used) {
+    public GankItem(Long id, String gankId, String createAt, String Desc, String publishedAt, String type, String url, String who, Boolean used) {
         this.id = id;
         this.gankId = gankId;
         this.createAt = createAt;
@@ -55,11 +55,11 @@ public class GankItem {
         this.gankId = gankId;
     }
 
-    public java.util.Date getCreateAt() {
+    public String getCreateAt() {
         return createAt;
     }
 
-    public void setCreateAt(java.util.Date createAt) {
+    public void setCreateAt(String createAt) {
         this.createAt = createAt;
     }
 

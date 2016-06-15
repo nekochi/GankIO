@@ -24,7 +24,7 @@ public class DaoGankGenerator {
         Entity gankItem = schema.addEntity(GANKITEM);
         gankItem.addIdProperty().autoincrement();
         gankItem.addStringProperty("gankId").notNull();
-        gankItem.addDateProperty("createAt");
+        gankItem.addStringProperty("createAt");
         gankItem.addStringProperty("Desc");
         gankItem.addStringProperty("publishedAt");
         gankItem.addStringProperty("type");
