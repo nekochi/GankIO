@@ -1,19 +1,83 @@
 package com.nekomimi.gankio.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Property;
+
 /**
  * Created by hongchi on 2016-3-3.
  * File description :
  */
-public  class GankEntity {
+@Entity
+public  class GankEntity implements Parcelable {
+    @Id
+    private Long id;
+    @Property(nameInDb = "GANKID")
     private String _id;
+    @Property(nameInDb = "_NS")
     private String _ns;
+    @Property(nameInDb = "CREATEDAT")
     private String createdAt;
+    @Property(nameInDb = "DESC")
     private String desc;
+    @Property(nameInDb = "PUBLISHEDAT")
     private String publishedAt;
+    @Property(nameInDb = "TYPE")
     private String type;
+    @Property(nameInDb = "URL")
     private String url;
-    private boolean used;
+    @Property(nameInDb = "USED")
+    private String used;
+    @Property(nameInDb = "WHO")
     private String who;
+
+    @Generated(hash = 923764062)
+    public GankEntity(Long id, String _id, String _ns, String createdAt,
+            String desc, String publishedAt, String type, String url, String used,
+            String who) {
+        this.id = id;
+        this._id = _id;
+        this._ns = _ns;
+        this.createdAt = createdAt;
+        this.desc = desc;
+        this.publishedAt = publishedAt;
+        this.type = type;
+        this.url = url;
+        this.used = used;
+        this.who = who;
+    }
+
+    @Generated(hash = 598526695)
+    public GankEntity() {
+    }
+
+    protected GankEntity(Parcel in) {
+        _id = in.readString();
+        _ns = in.readString();
+        createdAt = in.readString();
+        desc = in.readString();
+        publishedAt = in.readString();
+        type = in.readString();
+        url = in.readString();
+        used = in.readString();
+        who = in.readString();
+    }
+
+    public static final Creator<GankEntity> CREATOR = new Creator<GankEntity>() {
+        @Override
+        public GankEntity createFromParcel(Parcel in) {
+            return new GankEntity(in);
+        }
+
+        @Override
+        public GankEntity[] newArray(int size) {
+            return new GankEntity[size];
+        }
+    };
 
     public void set_id(String _id) {
         this._id = _id;
@@ -41,10 +105,6 @@ public  class GankEntity {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public void setUsed(boolean used) {
-        this.used = used;
     }
 
     public void setWho(String who) {
@@ -79,11 +139,41 @@ public  class GankEntity {
         return url;
     }
 
-    public boolean isUsed() {
-        return used;
-    }
-
     public String getWho() {
         return who;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUsed(String used) {
+        this.used = used;
+    }
+
+    public String getUsed() {
+        return this.used;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(_id);
+        dest.writeString(_ns);
+        dest.writeString(createdAt);
+        dest.writeString(desc);
+        dest.writeString(publishedAt);
+        dest.writeString(type);
+        dest.writeString(url);
+        dest.writeString(used);
+        dest.writeString(who);
     }
 }

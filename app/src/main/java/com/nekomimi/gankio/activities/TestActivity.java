@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.nekomimi.gankio.base.BaseActivity;
+
 /**
  * Created by hongchi on 2016-1-27.
  * File description :

@@ -1,4 +1,4 @@
-package com.nekomimi.gankio.activities;
+package com.nekomimi.gankio.HomeTask;
 
 import android.content.Context;
 import android.content.Intent;
@@ -30,11 +30,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nekomimi.gankio.R;
-import com.nekomimi.gankio.base.AppAction;
-import com.nekomimi.gankio.bean.GankDate;
+import com.nekomimi.gankio.activities.DetailActivity;
+import com.nekomimi.gankio.activities.SettingsActivity;
+import com.nekomimi.gankio.api.AppAction;
+import com.nekomimi.gankio.base.BaseActivity;
 import com.nekomimi.gankio.bean.GankEntity;
-import com.nekomimi.gankio.bean.GankItem;
-import com.nekomimi.gankio.db.GankDdHelper;
+import com.nekomimi.gankio.utils.AnimationUtil;
 import com.nekomimi.gankio.utils.NetUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -52,7 +53,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by hongchi on 2016-3-1.
  * File description :
  */
-public class HomeActivity extends BaseActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener
+public class HomeActivity extends BaseActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, HomeContract.View
 {
     private static final String TAG = "HomeActivity";
     private ActionBarDrawerToggle mActionBarDrawerToggle;
@@ -80,14 +81,53 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     protected ImageLoader mImageLoader = ImageLoader.getInstance();
     protected DisplayImageOptions mOptions;
 
+    private HomeContract.Presenter mPresenter;
+    @Override
+    public void updata(List<GankEntity> dataList) {
+        if(mData == null || mAdapter == null){
+            return;
+        }
+        mData.clear();
+        mData.addAll(dataList);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void loadmore(List<GankEntity> dataList) {
+        mData.addAll(mData.size(), dataList);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void changeDate(int day) {
+        mCalendar.add(Calendar.DAY_OF_MONTH, day);
+    }
+
+    @Override
+    public void changePage(int num) {
+        mPage = mPage + num;
+    }
+
+    @Override
+    public void setFresh(boolean flag) {
+        mSwipeRefreshLayout.setRefreshing(flag);
+    }
+
+    @Override
+    public void setPresenter(HomeContract.Presenter presenter) {
+        this.mPresenter = presenter;
+    }
+
     enum State{
         All,Android,Ios,App,休息视频,拓展资源,瞎推荐,前端,福利,收藏
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        new HomePresenter(this);
         initData();
         initView();
     }
@@ -133,15 +173,15 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 {
                     case R.id.nav_menu_all:
                         mState = State.All;
-                        AppAction.getInstance().day(mCalendar,mUiHandler);
+                        mPresenter.day(mCalendar);
                         break;
                     case R.id.nav_menu_android:
                         mState = State.Android;
-                        AppAction.getInstance().data(mUiHandler, "Android", mPageNum + "", mPage + "");
+                        mPresenter.data(State.Android, mPageNum , mPage );
                         break;
                     case R.id.nav_menu_ios:
                         mState = State.Ios;
-                        AppAction.getInstance().data(mUiHandler,"iOs",mPageNum+"",mPage+"");
+                        mPresenter.data(State.Ios, mPageNum , mPage );
                         break;
                     case R.id.nav_menu_app:
                         mState = State.App;
@@ -149,44 +189,23 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                         break;
                     case R.id.nav_menu_休息视频:
                         mState = State.休息视频;
-                        AppAction.getInstance().data(mUiHandler,"休息视频",mPageNum+"",mPage+"");
+                        mPresenter.data(State.休息视频, mPageNum , mPage );
                         break;
                     case R.id.nav_menu_拓展资源:
                         mState = State.拓展资源;
-                        AppAction.getInstance().data(mUiHandler,"拓展资源",mPageNum+"",mPage+"");
+                        mPresenter.data(State.拓展资源, mPageNum , mPage );
                         break;
                     case R.id.nav_menu_瞎推荐:
                         mState = State.瞎推荐;
-                        AppAction.getInstance().data(mUiHandler,"瞎推荐",mPageNum+"",mPage+"");
+                        mPresenter.data(State.瞎推荐, mPageNum , mPage );
                         break;
                     case R.id.nav_menu_前端:
                         mState = State.前端;
-                        AppAction.getInstance().data(mUiHandler,"前端",mPageNum+"",mPage+"");
+                        mPresenter.data(State.前端, mPageNum , mPage );
                         break;
                     case R.id.nav_menu_star:
                         mState = State.收藏;
-                        List dataList = GankDdHelper.getInstance(HomeActivity.this).queryAll();
-                        mData.clear();
-                        Toast.makeText(HomeActivity.this,dataList.size() + "+++",Toast.LENGTH_LONG).show();
-                        for(int i = 0 ; i < dataList.size() ; i++)
-                        {
-                            if(dataList.get(i) instanceof com.nekomimi.gankio.db.GankItem)
-                            {
-                                com.nekomimi.gankio.db.GankItem gi = (com.nekomimi.gankio.db.GankItem)dataList.get(i);
-                                GankEntity ge = new GankEntity();
-                                ge.setCreatedAt(gi.getCreateAt());
-                                ge.setDesc(gi.getDesc());
-                                ge.setPublishedAt(gi.getPublishedAt());
-                                ge.setType(gi.getType());
-                                ge.set_id(gi.getGankId());
-                                ge.setUrl(gi.getUrl());
-//                                ge.setUsed(gi.getUsed());
-                                ge.setWho(gi.getWho());
-                                mData.add(ge);
-                            }
-                        }
-                        mAdapter.notifyDataSetChanged();
-
+                        mPresenter.star(HomeActivity.this, mPageNum, mPage);
                         break;
 //                    case R.id.nav_menu_福利:
 //                        mState = State.福利;
@@ -265,8 +284,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mAppBarLayout = (AppBarLayout)findViewById(R.id.tabanim_appbar);
         mTestBt = (Button)findViewById(R.id.test_bt);
         mTestBt.setOnClickListener(this);
+        mTestBt.setTag("add");
         dataReset();
-        AppAction.getInstance().day(mCalendar, mUiHandler);
+        mPresenter.day(mCalendar);
     }
 
     private void initData()
@@ -293,30 +313,18 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         switch (mState)
         {
             case All:
-                AppAction.getInstance().day(mCalendar, mUiHandler);
+                mPresenter.day(mCalendar);
                 break;
             case Android:
-                AppAction.getInstance().data(mUiHandler, "Android", mPageNum + "", mPage + "");
-                break;
             case Ios:
-                AppAction.getInstance().data(mUiHandler, "iOs", mPageNum + "", mPage + "");
-                break;
             case App:
-                AppAction.getInstance().data(mUiHandler, "App", mPageNum + "", mPage + "");
-                break;
             case 休息视频:
-                AppAction.getInstance().data(mUiHandler, "休息视频", mPageNum + "", mPage + "");
-                break;
             case 拓展资源:
-                AppAction.getInstance().data(mUiHandler, "拓展资源", mPageNum + "", mPage + "");
-                break;
             case 瞎推荐:
-                AppAction.getInstance().data(mUiHandler, "瞎推荐", mPageNum + "", mPage + "");
-                break;
             case 福利:
-                AppAction.getInstance().data(mUiHandler, "福利", mPageNum + "", mPage + "");
-                break;
+                mPresenter.data(mState, mPageNum , mPage );
             case 收藏:
+                mPresenter.star(HomeActivity.this, mPageNum, mPage);
                 break;
             default:
                 break;
@@ -324,9 +332,11 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
 
 
     }
+    @Override
     public void dataReset()
     {
         mData.clear();
+        mAdapter.notifyDataSetChanged();
         mPage = 1;
         mCalendar = Calendar.getInstance();
     }
@@ -372,7 +382,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         switch (v.getId())
         {
             case R.id.test_bt:
-               Log.d(TAG,"testButton Clicked");
+                Log.d(TAG,"testButton Clicked");
+                if(mTestBt.getTag().equals("up")){
+                    AnimationUtil.rotationYView(mTestBt, "+", "add");
+                }else {
+                    AnimationUtil.rotationYView(mTestBt, "∧", "up");
+                }
                 break;
             case R.id.drawer_setting:
                 startActivity(new Intent(HomeActivity.this, SettingsActivity.class));
@@ -385,38 +400,19 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onRefresh() {
         dataReset();
-        AppAction.getInstance().day(mCalendar, mUiHandler);
+//        AppAction.getInstance().day(mCalendar, mUiHandler);
+        mPresenter.day(mCalendar);
     }
 
     @Override
     public void handleMessage(Message message)
     {
-        Log.d(TAG, "handleMessage");
-        mSwipeRefreshLayout.setRefreshing(false);
-        if(message.what == 0)
-        {
-            if(message.arg1 == AppAction.DAY_REQUEST)
-            {
-                mData.addAll(mData.size(), ((GankDate) message.obj).getResults().getAll());
-                mCalendar.add(Calendar.DAY_OF_MONTH, -1);
-                mAdapter.notifyDataSetChanged();
-            }
-            if(message.arg1 == AppAction.DATA_REQUEST)
-            {
-                mData.addAll(mData.size(),((GankItem)message.obj).getResults());
-                mPage++;
-                mAdapter.notifyDataSetChanged();
-            }
-
-        }
-        else
-        {
-            mCalendar.add(Calendar.DAY_OF_MONTH, -1);
-            AppAction.getInstance().day(mCalendar, mUiHandler);
-        }
 
     }
 
+    private void rotation(){
+
+    }
     class RAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     {
         private final int  NORMAL = 0;
@@ -475,13 +471,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                         if(way.equals(getString(R.string.this_app)))
                         {
                             Intent intent = new Intent(HomeActivity.this, DetailActivity.class);
-                            intent.putExtra(DetailActivity.URL,mData.get(position).getUrl());
-                            intent.putExtra(DetailActivity.ID,mData.get(position).get_id().toUpperCase());
-                            intent.putExtra(DetailActivity.TITLE, mData.get(position).getDesc());
-                            intent.putExtra(DetailActivity.WHO, mData.get(position).getWho());
-                            intent.putExtra(DetailActivity.CREATEAT, mData.get(position).getCreatedAt());
-                            intent.putExtra(DetailActivity.PUBLISHEDAT, mData.get(position).getPublishedAt());
-                            intent.putExtra(DetailActivity.TYPE, mData.get(position).getType());
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable("data", mData.get(position));
+                            intent.putExtras(bundle);
                             startActivity(intent);
                         }
                         if(way.equals(getString(R.string.browser)))
@@ -542,9 +534,14 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             if(holder instanceof ImageHolder)
             {
                 ImageHolder imageHolder = (ImageHolder)holder;
-                if(NetUtil.getNetworkState(HomeActivity.this) == NetUtil.WifiState &&
-                        PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getBoolean(getString(R.string.auto_load_pic_at_wifi),true))
+                if(PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getBoolean(getString(R.string.auto_load_pic_at_wifi),true))
                 {
+                    if (NetUtil.getNetworkState(HomeActivity.this) == NetUtil.WifiState){
+                        mImageLoader.displayImage(mData.get(position).getUrl(), imageHolder.mImageView, mOptions);
+                    }else {
+                        holder.itemView.setVisibility(View.GONE);
+                    }
+                }else {
                     mImageLoader.displayImage(mData.get(position).getUrl(), imageHolder.mImageView, mOptions);
                 }
             }

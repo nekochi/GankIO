@@ -1,4 +1,4 @@
-package com.nekomimi.gankio.base;
+package com.nekomimi.gankio;
 
 import android.app.Application;
 

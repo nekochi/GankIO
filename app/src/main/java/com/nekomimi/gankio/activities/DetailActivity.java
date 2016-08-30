@@ -2,17 +2,23 @@ package com.nekomimi.gankio.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import com.nekomimi.gankio.R;
+import com.nekomimi.gankio.base.BaseActivity;
+import com.nekomimi.gankio.bean.GankEntity;
 import com.nekomimi.gankio.db.GankDdHelper;
-import com.nekomimi.gankio.db.GankItem;
+import com.nekomimi.gankio.utils.PreferenceUtil;
+import com.nekomimi.gankio.utils.RemindUtil;
 
 import java.util.List;
 
@@ -35,48 +41,35 @@ public class DetailActivity extends BaseActivity
 
     private WebView mWebView;
     private Toolbar mToolbar;
-
-    private String mUrl;
-    private String mCreateAt;
-    private String mWho;
-    private String mType;
-    private String mPublishAt;
-    private String mTitle;
-    private String mId;
+    private TextView mTitleTxt;
+    private GankEntity mData;
     private boolean mIsStared = false;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        mTitleTxt = (TextView)findViewById(R.id.toolbar_title);
         mToolbar = (Toolbar)findViewById(R.id.toolbar_newsinfo);
-        initWebView();
-
-        mUrl = getIntent().getStringExtra(URL);
-        loadurl(mUrl);
-        mTitle = getIntent().getStringExtra(TITLE);
-        mId = getIntent().getStringExtra(ID);
-        mCreateAt = getIntent().getStringExtra(CREATEAT);
-        mWho = getIntent().getStringExtra(WHO);
-        mType = getIntent().getStringExtra(TYPE);
-        mPublishAt = getIntent().getStringExtra(PUBLISHEDAT);
-        Log.d("TITLE", mTitle);
-        mToolbar.setTitle(mTitle);
-
-//        mToolbar.inflateMenu(R.menu.detail_menu);
-//        mToolbar.setOnMenuItemClickListener(onMenuItemClick);
         setSupportActionBar(mToolbar);
-
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        initWebView();
+        mData = getIntent().getParcelableExtra("data");
+        loadurl(mData.getUrl());
+        updateTitle(mData.getDesc());
     }
 
+    public void updateTitle(String title){
+        mTitleTxt.setText(title);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.detail_menu, menu);
-        if(mId != null)
+        if(mData.get_id() != null)
         {
-            List result = GankDdHelper.getInstance(this).query(mId);
+            List result = GankDdHelper.getInstance(this).query(mData.get_id());
             if(result != null && result.size() != 0)
             {
                 menu.findItem(R.id.action_star).setIcon(R.mipmap.ic_star_white_24dp);
@@ -100,14 +93,23 @@ public class DetailActivity extends BaseActivity
             case R.id.action_star:
                 if(mIsStared)
                 {
-                    GankDdHelper.getInstance(this).delete(mId);
+                    GankDdHelper.getInstance(this).delete(mData.get_id());
                     mIsStared = false;
                     mToolbar.getMenu().findItem(R.id.action_star).setIcon(R.mipmap.ic_star_border_white_24dp);
                 }else {
-                    GankItem gankItem = new GankItem(null,mId,mCreateAt,mTitle,mPublishAt,mType,mUrl,mWho,null);
-                    GankDdHelper.getInstance(this).add(gankItem);
+                    GankDdHelper.getInstance(this).add(mData);
                     mIsStared = true;
                     mToolbar.getMenu().findItem(R.id.action_star).setIcon(R.mipmap.ic_star_white_24dp);
+                    if (PreferenceUtil.getShouldShowTip(DetailActivity.this)){
+                        Log.d(TAG, "onOptionsItemSelected: show bar" );
+                        RemindUtil.snackBar(mToolbar, "收藏功能目前仅支持本地存储，而且清理数据还会消失哦=。=", "不再提醒", Snackbar.LENGTH_LONG,
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        PreferenceUtil.setShouldshowtip(DetailActivity.this, false);
+                                    }
+                                });
+                    }
                 }
                 break;
         }
@@ -120,15 +122,14 @@ public class DetailActivity extends BaseActivity
     @Override
     protected void onNewIntent(Intent intent)
     {
-        mUrl = intent.getStringExtra("URL");
-        loadurl(mUrl);
+        loadurl(mData.getUrl());
     }
 
     public void loadurl(String url)
     {
-        if(mUrl!=null)
+        if(mData.getUrl()!=null)
         {
-            mWebView.loadUrl(mUrl);
+            mWebView.loadUrl(mData.getUrl());
         }
     }
 

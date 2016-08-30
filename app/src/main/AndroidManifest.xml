@@ -8,7 +8,7 @@
 
 
     <application
-        android:name=".base.NekoApplication"
+        android:name=".NekoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -18,7 +18,7 @@
             android:name=".activities.TestActivity"
             android:label="@string/name_testactivity"/>
         <activity
-            android:name=".activities.HomeActivity"
+            android:name=".HomeTask.HomeActivity"
             android:theme="@style/HomeTheme"
             android:label="@string/app_name">
             <intent-filter>

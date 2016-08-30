@@ -1,4 +1,4 @@
-package com.nekomimi.gankio.base;
+package com.nekomimi.gankio.api;
 
 import android.os.Handler;
 import android.os.Message;
@@ -119,5 +119,67 @@ public class AppAction
         }
 
         return sb.toString();
+    }
+
+    public void today(final AppCallBack<GankDate> callBack)
+    {
+        Calendar calendar = Calendar.getInstance();
+        day(calendar.get(Calendar.YEAR)+"",calendar.get(Calendar.MONTH)+1+"",calendar.get(Calendar.DAY_OF_MONTH)+"", callBack);
+    }
+
+    public void day(Calendar calendar, final AppCallBack<GankDate> callBack)
+    {
+        day(calendar.get(Calendar.YEAR) + "", calendar.get(Calendar.MONTH) + 1 + "", calendar.get(Calendar.DAY_OF_MONTH) + "", callBack);
+    }
+
+    public void day(String year, String month, String day, final AppCallBack<GankDate> callBack)
+    {
+
+        GsonGetRequest<GankDate> request = new GsonGetRequest<>(
+                makeUrl(HOST, "day", year, month, day),
+                GankDate.class,null, new Response.Listener<GankDate>() {
+            @Override
+            public void onResponse(GankDate response) {
+                int result = 1;
+                if ((!response.isError()) && response.getResults().getAll().size() != 0) {
+                    result = 0;
+                } else {
+                    result = 1;
+                }
+                callBack.onSuccess(result, response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callBack.onFailed(1, "volleyNetError");
+            }
+        });
+        VolleyConnect.getInstance().add(request);
+    }
+
+    public void data(String type, String num, String page, final AppCallBack<GankItem> callBack)
+    {
+        GsonGetRequest<GankItem> request = new GsonGetRequest<>(
+                makeUrl(HOST, "data", type, num, page),
+                GankItem.class,null, new Response.Listener<GankItem>() {
+            @Override
+            public void onResponse(GankItem response) {
+                int result = 1;
+                if((!response.isError()) && response.getResults().size() != 0)
+                {
+                   result = 0;
+                }else
+                {
+                    result = 1;
+                }
+                callBack.onSuccess(result, response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callBack.onFailed(1, "volleyNetError");
+            }
+        });
+        VolleyConnect.getInstance().add(request);
     }
 }

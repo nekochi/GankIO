@@ -3,7 +3,7 @@ package com.nekomimi.gankio.net;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.nekomimi.gankio.base.NekoApplication;
+import com.nekomimi.gankio.NekoApplication;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

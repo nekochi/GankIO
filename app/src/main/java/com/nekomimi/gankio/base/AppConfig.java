@@ -3,6 +3,8 @@ package com.nekomimi.gankio.base;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.nekomimi.gankio.NekoApplication;
+
 /**
  * Created by hongchi on 2016-1-27.
  * File description :

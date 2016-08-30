@@ -4,16 +4,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.nekomimi.activity.NewsInfoWebActivity">
+    tools:context="com.nekomimi.gankio.activities.DetailActivity">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_newsinfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         app:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:navigationIcon="@drawable/abc_ic_ab_back_mtrl_am_alpha"
+        app:navigationIcon="@drawable/abc_ic_ab_back_mtrl_am_alpha">
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:textSize="@dimen/abc_text_size_title_material_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:singleLine="true" />
 
-        />
+    </android.support.v7.widget.Toolbar>
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

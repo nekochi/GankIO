@@ -1,4 +1,4 @@
-package com.nekomimi.gankio.activities;
+package com.nekomimi.gankio.base;
 
 import android.content.Context;
 import android.os.Bundle;

@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.nekomimi.gankio.R;
+import com.nekomimi.gankio.base.BaseActivity;
 
 /**
  * Created by hongchi on 2016-4-20.

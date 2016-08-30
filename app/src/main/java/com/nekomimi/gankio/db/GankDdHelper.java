@@ -3,23 +3,28 @@ package com.nekomimi.gankio.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.List;
+import com.nekomimi.gankio.bean.DaoMaster;
+import com.nekomimi.gankio.bean.DaoSession;
+import com.nekomimi.gankio.bean.GankEntity;
+import com.nekomimi.gankio.bean.GankEntityDao;
 
-import de.greenrobot.dao.query.Query;
+import org.greenrobot.greendao.query.Query;
+
+import java.util.List;
 
 /**
  * Created by hongchi on 2016-5-9.
  * File description :
  */
 public class GankDdHelper {
-    private static final String GankDbName = "gank";
+    private static final String GankDbName = "gank.db";
 
     private static GankDdHelper mInstance;
 
     private SQLiteDatabase db;
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
-    private GankItemDao mGankItemDao;
+    private GankEntityDao mGankEntityDao;
     private Context mContext;
     private GankDdHelper(Context context)
     {
@@ -41,33 +46,33 @@ public class GankDdHelper {
         db = helper.getWritableDatabase();
         mDaoMaster = new DaoMaster(db);
         mDaoSession = mDaoMaster.newSession();
-        mGankItemDao = mDaoSession.getGankItemDao();
+        mGankEntityDao = mDaoSession.getGankEntityDao();
     }
 
     public List query(String id)
     {
-        Query query = mGankItemDao.queryBuilder().where(GankItemDao.Properties.GankId.eq(id)).build();
+        Query query = mGankEntityDao.queryBuilder().where(GankEntityDao.Properties._id.eq(id)).build();
         return query.list();
     }
 
-    public List queryAll()
+    public List<GankEntity> queryAll()
     {
-        return mGankItemDao.loadAll();
+        return mGankEntityDao.loadAll();
     }
 
-    public void add(GankItem item)
+    public void add(GankEntity item)
     {
-        mGankItemDao.insertOrReplace(item);
+        mGankEntityDao.insertOrReplace(item);
     }
 
     public void delete(String id)
     {
-        List<GankItem> result = query(id);
+        List<GankEntity> result = query(id);
         if(result != null && result.size() != 0)
         {
-            for (GankItem item : result)
+            for (GankEntity item : result)
             {
-                mGankItemDao.deleteByKey(item.getId());
+                mGankEntityDao.deleteByKey(item.getId());
             }
         }
     }
