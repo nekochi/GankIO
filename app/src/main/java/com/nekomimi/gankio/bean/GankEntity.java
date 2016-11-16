@@ -3,10 +3,15 @@ package com.nekomimi.gankio.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.nekomimi.gankio.db.GankConverter;
+
+import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
+
+import java.util.List;
 
 /**
  * Created by hongchi on 2016-3-3.
@@ -34,11 +39,20 @@ public  class GankEntity implements Parcelable {
     private String used;
     @Property(nameInDb = "WHO")
     private String who;
+    /**
+     * images : ["http://img.gank.io/bbd6baf4-01ba-4040-956c-32b5f7d9c2e8"]
+     * source : web
+     */
+    @Property(nameInDb = "SOURCE")
+    private String source;
 
-    @Generated(hash = 923764062)
-    public GankEntity(Long id, String _id, String _ns, String createdAt,
-            String desc, String publishedAt, String type, String url, String used,
-            String who) {
+    @Convert(converter = GankConverter.class, columnType = String.class)
+    private List<String> images;
+
+    @Generated(hash = 563868214)
+    public GankEntity(Long id, String _id, String _ns, String createdAt, String desc,
+            String publishedAt, String type, String url, String used, String who,
+            String source, List<String> images) {
         this.id = id;
         this._id = _id;
         this._ns = _ns;
@@ -49,6 +63,8 @@ public  class GankEntity implements Parcelable {
         this.url = url;
         this.used = used;
         this.who = who;
+        this.source = source;
+        this.images = images;
     }
 
     @Generated(hash = 598526695)
@@ -176,4 +192,24 @@ public  class GankEntity implements Parcelable {
         dest.writeString(used);
         dest.writeString(who);
     }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+
+
 }

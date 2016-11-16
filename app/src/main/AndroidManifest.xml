@@ -12,7 +12,6 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.TestActivity"
@@ -20,6 +19,7 @@
         <activity
             android:name=".HomeTask.HomeActivity"
             android:theme="@style/HomeTheme"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +32,15 @@
             android:label="@string/name_detailactivity" />
         <activity android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"/>
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="582c304e734be448f5001d93" >
+        </meta-data>
+        <meta-data
+            android:name="UMENG_MESSAGE_SECRET"
+            android:value="39a2976be87f1fec418691952d90dd10" >
+        </meta-data>
     </application>
 
 </manifest>

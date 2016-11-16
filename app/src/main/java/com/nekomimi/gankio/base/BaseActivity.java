@@ -14,29 +14,22 @@ import java.lang.ref.WeakReference;
  */
 public class BaseActivity extends AppCompatActivity
 {
-
-//    private AppAction mAppAction = null;
     private Context mContext;
 
     @Override
     protected void onCreate(Bundle saveInstanceState)
     {
         super.onCreate(saveInstanceState);
-//        this.mAppAction = new AppActionImpl(this);
+//        this.mAppGetAction = new AppGetActionImpl(this);
         this.mContext = this;
     }
     @Override
     protected void onResume()
     {
         super.onResume();
-//        this.mAppAction = new AppActionImpl(this);
+//        this.mAppGetAction = new AppGetActionImpl(this);
         this.mContext = this;
     }
-
-//    public AppAction getAction()
-//    {
-//        return this.mAppAction;
-//    }
 
     public Context getContext()
     {

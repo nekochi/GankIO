@@ -2,7 +2,6 @@ package com.nekomimi.gankio.HomeTask;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
@@ -12,8 +11,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,16 +31,12 @@ import android.widget.Toast;
 import com.nekomimi.gankio.R;
 import com.nekomimi.gankio.activities.DetailActivity;
 import com.nekomimi.gankio.activities.SettingsActivity;
-import com.nekomimi.gankio.api.AppAction;
 import com.nekomimi.gankio.base.BaseActivity;
 import com.nekomimi.gankio.bean.GankEntity;
 import com.nekomimi.gankio.utils.AnimationUtil;
 import com.nekomimi.gankio.utils.NetUtil;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.squareup.picasso.Picasso;
+import com.umeng.message.PushAgent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -77,9 +72,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     private Calendar mCalendar;
     private Context mContext;
     private UiHandler mUiHandler = new UiHandler(this);
+    private int mTag = 0;
 
-    protected ImageLoader mImageLoader = ImageLoader.getInstance();
-    protected DisplayImageOptions mOptions;
 
     private HomeContract.Presenter mPresenter;
     @Override
@@ -126,6 +120,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        PushAgent.getInstance(this).onAppStart();
         setContentView(R.layout.activity_home);
         new HomePresenter(this);
         initData();
@@ -185,7 +180,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                         break;
                     case R.id.nav_menu_app:
                         mState = State.App;
-                        AppAction.getInstance().data(mUiHandler,"App",mPageNum+"",mPage+"");
+                        mPresenter.data(State.App, mPageNum, mPage);
                         break;
                     case R.id.nav_menu_休息视频:
                         mState = State.休息视频;
@@ -209,7 +204,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                         break;
 //                    case R.id.nav_menu_福利:
 //                        mState = State.福利;
-//                        AppAction.getInstance().data(mUiHandler,"福利",mPageNum+"",mPage+"");
+//                        AppGetAction.getInstance().data(mUiHandler,"福利",mPageNum+"",mPage+"");
 //                        break;
                     default:
                         break;
@@ -233,11 +228,11 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mSwipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, R.color.colorRipple);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mRecyclerView = (RecyclerView)findViewById(R.id.rv_datalist);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
         mAdapter = new RAdapter();
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            int lastVisibleItem;
+            int []lastVisibleItem;
             private static final float HIDE_THRESHOLD = 100;
             private static final float SHOW_THRESHOLD = 50;
             int scrollDist = 0;
@@ -245,7 +240,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+                lastVisibleItem = ((StaggeredGridLayoutManager) recyclerView.getLayoutManager()).findLastCompletelyVisibleItemPositions(null);
                 //  Check scrolled distance against the minimum
                 if (isVisible && scrollDist > HIDE_THRESHOLD) {
                     //  Hide fab & reset scrollDist
@@ -269,9 +264,19 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (newState == RecyclerView.SCROLL_STATE_IDLE
-                        && lastVisibleItem + 1 == recyclerView.getAdapter().getItemCount()) {
-                    loadmore();
+//                if (newState == RecyclerView.SCROLL_STATE_IDLE
+//                        && lastVisibleItem + 1 == recyclerView.getAdapter().getItemCount()) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    for (int i : lastVisibleItem){
+                        if(i+1>=recyclerView.getAdapter().getItemCount()){
+                            loadmore();
+                        }
+                    }
+                }
+                if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                    Picasso.with(mContext).pauseTag(mTag);
+                }else {
+                    Picasso.with(mContext).resumeTag(mTag);
                 }
             }
 
@@ -296,15 +301,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         mCalendar = Calendar.getInstance();
         mState = State.All;
 
-        mOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)//设置下载的图片是否缓存在内存中
-                .considerExifParams(true)  //是否考虑JPEG图像EXIF参数（旋转，翻转）
-                .imageScaleType(ImageScaleType.EXACTLY_STRETCHED)//设置图片以如何的编码方式显示
-                .bitmapConfig(Bitmap.Config.RGB_565)//设置图片的解码类型//
-                .resetViewBeforeLoading(true)//设置图片在下载前是否重置，复位
-                .displayer(new RoundedBitmapDisplayer(20))//是否设置为圆角，弧度为多少
-                .displayer(new FadeInBitmapDisplayer(100))//是否图片加载好后渐入的动画时间
-                .build();//构建完成
     }
 
     private void loadmore()
@@ -400,7 +396,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onRefresh() {
         dataReset();
-//        AppAction.getInstance().day(mCalendar, mUiHandler);
         mPresenter.day(mCalendar);
     }
 
@@ -423,7 +418,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             if(viewType == NORMAL)
-                return new NormalCardHolder( LayoutInflater.from(mContext).inflate(R.layout.view_itemcard,parent,false));
+                return new NormalCardHolder( LayoutInflater.from(mContext).inflate(R.layout.view_staggridcard,parent,false));
             if(viewType == IMAGE)
                 return new ImageHolder( LayoutInflater.from(mContext).inflate(R.layout.view_imagecard, parent, false));
             if(viewType == VIDEO)
@@ -499,6 +494,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 normalHolder.mWho.setText(mData.get(position).getWho());
                 normalHolder.mTitle.setText(mData.get(position).getDesc());
                 normalHolder.mTime.setText(mData.get(position).getCreatedAt());
+                if (mData.get(position).getImages()!=null&&mData.get(position).getImages().size()>0){
+                    StringBuilder picUrl = new StringBuilder(mData.get(position).getImages().get(0)).append("?imageView2/0/w/250");
+                    Picasso.with(mContext).load(picUrl.toString()).tag(mTag).placeholder(R.mipmap.ic_launcher).into(normalHolder.mPic);
+                }else {
+                    normalHolder.mPic.setImageDrawable(null);
+                }
                 if("android".equals(mData.get(position).getType().toLowerCase()))
                 {
                     normalHolder.mIcon.setImageResource(R.mipmap.ic_android_black_24dp);
@@ -537,12 +538,12 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
                 if(PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).getBoolean(getString(R.string.auto_load_pic_at_wifi),true))
                 {
                     if (NetUtil.getNetworkState(HomeActivity.this) == NetUtil.WifiState){
-                        mImageLoader.displayImage(mData.get(position).getUrl(), imageHolder.mImageView, mOptions);
+                        Picasso.with(mContext).load(mData.get(position).getUrl()).tag(mTag).into(imageHolder.mImageView);
                     }else {
                         holder.itemView.setVisibility(View.GONE);
                     }
                 }else {
-                    mImageLoader.displayImage(mData.get(position).getUrl(), imageHolder.mImageView, mOptions);
+                    Picasso.with(mContext).load(mData.get(position).getUrl()).tag(mTag).into(imageHolder.mImageView);
                 }
             }
             if(holder instanceof VideoHolder)
@@ -585,12 +586,14 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener, 
             TextView mTitle;
             TextView mWho;
             TextView mTime;
+            ImageView mPic;
             public NormalCardHolder(View itemView) {
                 super(itemView);
                 mIcon = (ImageView)itemView.findViewById(R.id.iv_icon);
                 mTitle = (TextView)itemView.findViewById(R.id.tv_title);
                 mWho = (TextView)itemView.findViewById(R.id.tv_who);
                 mTime = (TextView)itemView.findViewById(R.id.tv_time);
+                mPic = (ImageView)itemView.findViewById(R.id.iv_pic);
             }
         }
 

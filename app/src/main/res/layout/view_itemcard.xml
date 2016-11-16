@@ -3,15 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/item_cardview"
-    app:cardCornerRadius="3dp">
+    app:cardCornerRadius="0dp">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
             android:id="@+id/title"
             android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_width="240dp"
+            android:layout_height="80dp"
             android:layout_alignParentTop="true">
             <FrameLayout
                 android:layout_width="0dp"
@@ -27,11 +27,20 @@
                 android:id="@+id/tv_title"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="9"
+                android:layout_weight="5"
+                android:padding="5dp"
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:text="test/测试"
                 android:maxLines="2"/>
         </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_pic"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toRightOf="@id/title"
+            android:layout_toEndOf="@id/title"
+            android:layout_width="60dp"
+            android:layout_height="60dp" />
         <TextView
             android:id="@+id/tv_who"
             android:layout_width="wrap_content"

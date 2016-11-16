@@ -3,8 +3,8 @@ package com.nekomimi.gankio.HomeTask;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.nekomimi.gankio.api.AppAction;
-import com.nekomimi.gankio.api.AppCallBack;
+import com.nekomimi.gankio.api.impl.AppGetAction;
+import com.nekomimi.gankio.api.def.AppCallBack;
 import com.nekomimi.gankio.bean.GankDate;
 import com.nekomimi.gankio.bean.GankEntity;
 import com.nekomimi.gankio.bean.GankItem;
@@ -21,13 +21,13 @@ import java.util.List;
 public class HomePresenter implements HomeContract.Presenter {
     private static final String TAG = "HomePresenter";
 
-    private final AppAction mAppAction;
+    private final AppGetAction mAppGetAction;
 
     private final HomeContract.View mHomeView;
 
     public HomePresenter(@NonNull HomeContract.View view){
         this.mHomeView = view;
-        this.mAppAction = AppAction.getInstance();
+        this.mAppGetAction = AppGetAction.getInstance();
         mHomeView.setPresenter(this);
     }
 
@@ -38,7 +38,7 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void data(HomeActivity.State type, int pageNum, int page) {
-        mAppAction.data(type.name(), String.valueOf(pageNum), String.valueOf(page), new AppCallBack<GankItem>() {
+        mAppGetAction.data(type.name(), String.valueOf(pageNum), String.valueOf(page), new AppCallBack<GankItem>() {
             @Override
             public void onSuccess(int result, GankItem data) {
                 if (result == 0){
@@ -57,7 +57,7 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void day(final Calendar calendar) {
-        mAppAction.day(calendar, new AppCallBack<GankDate>() {
+        mAppGetAction.day(calendar, new AppCallBack<GankDate>() {
             @Override
             public void onSuccess(int result, GankDate data) {
                 mHomeView.setFresh(false);

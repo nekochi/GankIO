@@ -31,8 +31,10 @@
 
     <style name="item_cardview">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">80dp</item>
-        <item name="android:layout_margin">5dp</item>
-        
+        <item name="android:layout_height">100dp</item>
+        <item name="android:layout_margin">0dp</item>
     </style>
+
+    <style name="HomeTheme" parent="AppTheme"/>
+
 </resources>

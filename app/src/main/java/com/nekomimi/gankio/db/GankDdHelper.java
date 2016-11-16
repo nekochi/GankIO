@@ -3,10 +3,7 @@ package com.nekomimi.gankio.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.nekomimi.gankio.bean.DaoMaster;
-import com.nekomimi.gankio.bean.DaoSession;
 import com.nekomimi.gankio.bean.GankEntity;
-import com.nekomimi.gankio.bean.GankEntityDao;
 
 import org.greenrobot.greendao.query.Query;
 

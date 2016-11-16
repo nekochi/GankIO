@@ -1,4 +1,4 @@
-package com.nekomimi.gankio.api;
+package com.nekomimi.gankio.api.def;
 
 /**
  * Created by Administrator on 2016/8/24.

@@ -12,7 +12,9 @@ public class ExampleUnitTest {
     String x, y;
     @Test
     public void addition_isCorrect() throws Exception {
-
+        Number number = 6.8;
+        int value = number.intValue();
+        System.out.print(value);
     }
     @Test
     public void multiply_isCorrect() throws Exception{
